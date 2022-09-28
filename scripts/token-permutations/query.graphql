@@ -1,0 +1,23 @@
+query TokenPairs($first: Int = 5000, $skip: Int = 0, $where: TokenPrice_filter, $block: Block_height) {
+  tokenPairs(first: $first, skip: $skip, where: $where, block: $block) {
+    id
+    token {
+      id
+    }
+    pair {
+      liquidityUSD
+      token0 {
+        id
+      }
+      token1 {
+        id
+      }
+    }
+  }
+
+  _meta {
+    block {
+      number
+    }
+  }
+}
