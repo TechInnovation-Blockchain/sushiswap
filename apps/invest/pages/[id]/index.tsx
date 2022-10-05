@@ -1,7 +1,6 @@
 import { formatPercent } from '@sushiswap/format'
 import { AppearOnMount, BreadcrumbLink } from '@sushiswap/ui'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
-import { useRouter } from 'next/router'
 import { FC } from 'react'
 import useSWR, { SWRConfig } from 'swr'
 
@@ -36,6 +35,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query, res }) => 
   const [pair] = await Promise.all([getPool(query.id as string)])
   return {
     props: {
+      id: query.id,
       fallback: {
         [`/earn/api/pool/${query.id}`]: { pair },
       },
@@ -43,19 +43,18 @@ export const getServerSideProps: GetServerSideProps = async ({ query, res }) => 
   }
 }
 
-const Pool: FC<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ fallback }) => {
+const Pool: FC<InferGetServerSidePropsType<typeof getServerSideProps>> = ({ fallback, id }) => {
   return (
     <SWRConfig value={{ fallback }}>
-      <_Pool />
+      <_Pool id={id} />
     </SWRConfig>
   )
 }
 
 const fetcher = (url) => fetch(url).then((response) => response.json())
 
-const _Pool = () => {
-  const router = useRouter()
-  const { data } = useSWR<{ pair: PairWithAlias }>({ url: `/earn/api/pool/${router.query.id}` }, fetcher)
+const _Pool = ({ id }: { id: string }) => {
+  const { data } = useSWR<{ pair: PairWithAlias }>(`/earn/api/pool/${id}`, fetcher)
 
   if (!data) return <></>
 
