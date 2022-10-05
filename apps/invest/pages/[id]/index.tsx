@@ -34,7 +34,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query, res }) => 
   res.setHeader('Cache-Control', 'public, s-maxage=100, stale-while-revalidate=599')
   const [pair] = await Promise.all([getPool(query.id as string)])
 
-  console.log('server query', query)
+  throw Error(JSON.stringify(query))
 
   return {
     props: {
