@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const allowedParams = ['networks']
+const allowedParams = ['networks', 'id']
 
 export const config = {
   matcher: '/earn',
