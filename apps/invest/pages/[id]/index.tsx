@@ -31,8 +31,9 @@ const LINKS = ({ pair }: { pair: PairWithAlias }): BreadcrumbLink[] => [
 ]
 
 export const getServerSideProps: GetServerSideProps = async ({ query, res }) => {
+  console.error('before getServerSideProps', query)
   const [pair] = await Promise.all([getPool(query.id as string)])
-  console.error('getServerSideProps query', query)
+  console.error('after getServerSideProps query', query)
   return {
     props: {
       id: query.id,
