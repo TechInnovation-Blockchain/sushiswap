@@ -43,6 +43,45 @@ export const resolvers: Resolvers = {
     fees1w: (root, args, context, info) => root.fees1w || '0',
   },
   Query: {
+    crossChainTransactions: async (root, args, context, info) => {
+      const pools = await Promise.all([
+        SUSHISWAP_ENABLED_NETWORKS.includes(args.chainId)
+          ? context.SushiSwap.Query.pair({
+              root,
+              args,
+              context: {
+                ...context,
+                chainId: args.chainId,
+                chainName: chainName[args.chainId],
+                chainShortName: chainShortName[args.chainId],
+                subgraphName: SUSHISWAP_SUBGRAPH_NAME[args.chainId],
+                subgraphHost: SUBGRAPH_HOST[args.chainId],
+              },
+              info,
+            })
+          : undefined,
+        TRIDENT_ENABLED_NETWORKS.includes(args.chainId)
+          ? context.Trident.Query.pair({
+              root,
+              args,
+              context: {
+                ...context,
+                chainId: args.chainId,
+                chainName: chainName[args.chainId],
+                chainShortName: chainShortName[args.chainId],
+                subgraphName: TRIDENT_SUBGRAPH_NAME[args.chainId],
+                subgraphHost: SUBGRAPH_HOST[args.chainId],
+              },
+              info,
+            })
+          : undefined,
+      ])
+
+      const pool = pools.filter(Boolean).find(Boolean)
+      if (!pool) return
+
+      return pool
+    },
     crossChainBundles: async (root, args, context, info) => {
       return Promise.all([
         ...args.chainIds
@@ -371,7 +410,10 @@ export const resolvers: Resolvers = {
                           ...args,
                           first: poolIds.length,
                           // need the name_contains for filtering, since we're adding farms to the query
-                          where: { id_in: poolIds, name_contains_nocase: args.where?.name_contains_nocase },
+                          where: {
+                            id_in: poolIds,
+                            name_contains_nocase: args.where?.name_contains_nocase,
+                          },
                         },
                         context: {
                           ...context,
@@ -388,7 +430,10 @@ export const resolvers: Resolvers = {
                         args: {
                           ...args,
                           first: poolIds.length,
-                          where: { id_in: poolIds, name_contains_nocase: args.where?.name_contains_nocase },
+                          where: {
+                            id_in: poolIds,
+                            name_contains_nocase: args.where?.name_contains_nocase,
+                          },
                           block: { number: Number(args.oneDayBlockNumbers[args.chainIds.indexOf(chainId)]) },
                         },
                         context: {
@@ -406,7 +451,10 @@ export const resolvers: Resolvers = {
                         args: {
                           ...args,
                           first: poolIds.length,
-                          where: { id_in: poolIds, name_contains_nocase: args.where?.name_contains_nocase },
+                          where: {
+                            id_in: poolIds,
+                            name_contains_nocase: args.where?.name_contains_nocase,
+                          },
                           block: { number: Number(args.oneWeekBlockNumbers[args.chainIds.indexOf(chainId)]) },
                         },
                         context: {
@@ -841,7 +889,11 @@ export const resolvers: Resolvers = {
         ...args.chainIds
           .filter((el) => [...Object.keys(MINICHEF_SUBGRAPH_NAME)].includes(String(el)))
           .map((chainId) =>
-            fetcher({ chainId, subgraphName: MINICHEF_SUBGRAPH_NAME[chainId], subgraphHost: SUBGRAPH_HOST[chainId] })
+            fetcher({
+              chainId,
+              subgraphName: MINICHEF_SUBGRAPH_NAME[chainId],
+              subgraphHost: SUBGRAPH_HOST[chainId],
+            })
           ),
       ]).then((users) => users.flat())
     },

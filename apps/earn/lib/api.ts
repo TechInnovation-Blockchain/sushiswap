@@ -1,5 +1,9 @@
 import { chainShortNameToChainId } from '@sushiswap/chain'
-import { getBuiltGraphSDK, QuerycrossChainPairsArgs } from '@sushiswap/graph-client/.graphclient'
+import {
+  CrossChainTransactionsQuery,
+  getBuiltGraphSDK,
+  QuerycrossChainPairsArgs,
+} from '@sushiswap/graph-client/.graphclient'
 import { addSeconds, getUnixTime, startOfHour, startOfMinute, startOfSecond, subDays, subYears } from 'date-fns'
 
 import { SUPPORTED_CHAIN_IDS } from '../config'
@@ -119,6 +123,14 @@ export const getPool = async (id: string) => {
     now: Math.round(new Date().getTime() / 1000),
   })
   return pair
+}
+
+export const getPoolTransactions = async (id: string): Promise<AsyncIterable<CrossChainTransactionsQuery>> => {
+  console.log(id.includes(':') ? id.split(':')[1] : id)
+  return sdk.CrossChainTransactions({
+    id: id.includes(':') ? id.split(':')[1] : id,
+    chainId: chainShortNameToChainId[id.split(':')[0]],
+  })
 }
 
 export const getOneYearBlock = async () => {

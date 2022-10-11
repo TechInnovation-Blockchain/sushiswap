@@ -20,6 +20,7 @@ import {
   PoolRewards,
   PoolStats,
 } from '../../components'
+import { TransactionsTable } from '../../components/PoolsSection/Tables/TransactionsTable/TransactionsTable'
 import { getPool } from '../../lib/api'
 import { GET_POOL_TYPE_MAP } from '../../lib/constants'
 import { PairWithAlias } from '../../types'
@@ -89,6 +90,7 @@ const _Pool = () => {
                 </div>
               </div>
             </div>
+            <TransactionsTable pair={pair} />
           </Layout>
           <PoolActionBar pair={pair} />
         </PoolPositionRewardsProvider>

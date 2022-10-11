@@ -513,3 +513,19 @@ query CrossChainUserWithFarms($id: ID!, $block: Block_height, $now: Int!, $chain
     chainName
   }
 }
+
+query CrossChainTransactions($id: ID!, $chainId: Int!) @live {
+  crossChainTransactions(id: $id, chainId: $chainId) {
+    chainId
+    chainName
+    chainShortName
+    id
+    swaps(first: 10, orderBy: timestamp, orderDirection: desc) {
+      amount0In
+      amount1In
+      amount0Out
+      amount1Out
+      id
+    }
+  }
+}
