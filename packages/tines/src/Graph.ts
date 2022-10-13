@@ -1055,12 +1055,7 @@ export class Graph {
 
       const total = outAmount
 
-      // IMPORTANT: Casting to Number to avoid compiler bug which for some reason
-      // keeps reference to outAmount which is mutated later
-      // const total = Number(outAmount)
-      // const totalTest = outAmount
-
-      // console.debug('BEFORE', { outAmount, total, totalTest })
+      console.debug('BEFORE', { outAmount, total })
 
       outEdges.forEach((e, i) => {
         const p = e[2] as number
@@ -1088,11 +1083,11 @@ export class Graph {
           absolutePortion: p / total,
         })
         gasSpent += (e[0] as Edge).pool.swapGasCost
-        // console.debug('before amountOut mutation', { total, outAmount })
+        console.debug('before amountOut mutation', { total, outAmount })
         outAmount -= p
-        // console.debug('after amountOut mutation', { total, outAmount })
+        console.debug('after amountOut mutation', { total, outAmount })
       })
-      // console.debug('AFTER', { outAmount, total, totalTest }, outAmount / total)
+      console.debug('AFTER', { outAmount, total }, outAmount / total)
       console.assert(outAmount / total < 1e-12, 'Error 281')
     })
     return { legs, gasSpent, topologyWasChanged }
