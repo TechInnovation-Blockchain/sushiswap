@@ -1,5 +1,15 @@
-query ExchangePairs($first: Int = 1000, $skip: Int = 0, $where: Pair_filter, $block: Block_height) {
-  pairs: EXCHANGE_pairs(first: $first, skip: $skip, where: $where, block: $block) {
+query ExchangePairs(
+  $first: Int = 1000, 
+  $skip: Int = 0, 
+  $where: Exchange_Pair_filter, 
+  $block: Exchange_Block_height
+) {
+  pairs: Exchange_pairs(
+    first: $first, 
+    skip: $skip,
+    where: $where,
+    block: $block
+  ) {
     id
     name
     token0 {
@@ -20,8 +30,14 @@ query ExchangePairs($first: Int = 1000, $skip: Int = 0, $where: Pair_filter, $bl
   }
 }
 
-query ExchangeUser($block: Block_height, $id: ID!) {
-  user: EXCHANGE_user(id: $id) {
+query ExchangeUser(
+  $id: ID!, 
+  $block: Exchange_Block_height
+) {
+  user: Exchange_user(
+    id: $id, 
+    block: $block
+  ) {
     id
     liquidityPositions(first: 25000) {
       id
@@ -47,8 +63,22 @@ query ExchangeUser($block: Block_height, $id: ID!) {
   }
 }
 
-query ExchangeLiquidityPositions($block: Block_height, $first: Int = 10000, $orderBy: LiquidityPosition_orderBy, $orderDirection:  OrderDirection, $skip: Int, $where: LiquidityPosition_filter) {
-  liquidityPositions: EXCHANGE_liquidityPositions(block: $block, first: $first, orderBy: $orderBy, orderDirection: $orderDirection, skip: $skip, where: $where) {
+query ExchangeLiquidityPositions(
+  $first: Int = 1000,
+  $skip: Int = 0,
+  $orderBy: Exchange_LiquidityPosition_orderBy,
+  $orderDirection:  Exchange_OrderDirection,
+  $where: Exchange_LiquidityPosition_filter,
+  $block: Exchange_Block_height
+) {
+  liquidityPositions: Exchange_liquidityPositions(
+    first: $first,
+    skip: $skip,
+    orderBy: $orderBy,
+    orderDirection: $orderDirection,
+    where: $where,
+    block: $block,
+  ) {
     id
     liquidityTokenBalance
     pair {
@@ -71,13 +101,13 @@ query ExchangeLiquidityPositions($block: Block_height, $first: Int = 10000, $ord
   }
 }
 
-query ExchangeTokenPrices($first: Int = 1000, $skip: Int = 0, $where: Token_filter, $block: Block_height) {
-  tokens: EXCHANGE_tokens(first: $first, skip: $skip, where: $where, block: $block) {
+query ExchangeTokenPrices($first: Int = 1000, $skip: Int = 0, $where: Exchange_Token_filter, $block: Exchange_Block_height) {
+  tokens: Exchange_tokens(first: $first, skip: $skip, where: $where, block: $block) {
     id
     derivedETH
   }
 
-  bundle: EXCHANGE_bundle(id: 1, block: $block) {
+  bundle: Exchange_bundle(id: 1, block: $block) {
     ethPrice
   }
 }

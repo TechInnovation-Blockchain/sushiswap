@@ -5,14 +5,14 @@ import {
   TRIDENT_ENABLED_NETWORKS,
 } from '@sushiswap/graph-config'
 
-import { Factory, QueryResolvers } from '../../../.graphclient'
+import { Bundle, QueryResolvers } from '../../.graphclient'
 
-export const crossChainFactories: QueryResolvers['crossChainFactories'] = async (root, args, context, info) => {
+export const crossChainBundles: QueryResolvers['crossChainBundles'] = async (root, args, context, info) => {
   return Promise.all([
     ...args.chainIds
       .filter((el): el is typeof TRIDENT_ENABLED_NETWORKS[number] => TRIDENT_ENABLED_NETWORKS.includes(el))
       .map((chainId) =>
-        context.Trident.Query.factories({
+        context.Trident.Query.bundles({
           root,
           args,
           context: {
@@ -22,19 +22,19 @@ export const crossChainFactories: QueryResolvers['crossChainFactories'] = async 
             subgraphHost: SUBGRAPH_HOST[chainId],
           },
           info,
-        }).then((factories: Factory[]) => {
-          return factories?.length > 0
-            ? factories.map((factory) => ({
-                ...factory,
+        }).then((bundles: Bundle[]) =>
+          bundles?.length > 0
+            ? bundles.map((bundle) => ({
+                ...bundle,
                 chainId,
               }))
             : []
-        })
+        )
       ),
     ...args.chainIds
       .filter((el): el is typeof SUSHISWAP_ENABLED_NETWORKS[number] => SUSHISWAP_ENABLED_NETWORKS.includes(el))
       .map((chainId) =>
-        context.SushiSwap.Query.factories({
+        context.SushiSwap.Query.bundles({
           root,
           args,
           context: {
@@ -44,14 +44,14 @@ export const crossChainFactories: QueryResolvers['crossChainFactories'] = async 
             subgraphHost: SUBGRAPH_HOST[chainId],
           },
           info,
-        }).then((factories: Factory[]) => {
-          return factories?.length > 0
-            ? factories.map((factory) => ({
-                ...factory,
+        }).then((bundles: Bundle[]) =>
+          bundles?.length > 0
+            ? bundles.map((bundle) => ({
+                ...bundle,
                 chainId,
               }))
             : []
-        })
+        )
       ),
-  ]).then((factories) => factories.flat())
+  ]).then((bundles) => bundles.flat())
 }

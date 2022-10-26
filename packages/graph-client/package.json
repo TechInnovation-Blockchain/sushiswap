@@ -18,8 +18,7 @@
   "source": ".graphclient/index.ts",
   "typings": ".graphclient/index.d.ts",
   "files": [
-    ".graphclient/**",
-    "fetchers/**"
+    ".graphclient/**"
   ],
   "scripts": {
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
@@ -37,6 +36,7 @@
     "@graphprotocol/client-cli": "2.2.15",
     "@graphprotocol/client-add-source-name": "latest",
     "@graphprotocol/client-auto-pagination": "latest",
+    "@graphprotocol/client-auto-type-merging": "latest",
     "@graphql-mesh/transform-filter-schema": "latest",
     "@graphql-mesh/transform-prefix": "latest",
     "@graphql-mesh/transform-prune": "latest",

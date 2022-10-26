@@ -7,11 +7,11 @@ import {
   TRIDENT_SUBGRAPH_NAME,
 } from '@sushiswap/graph-config'
 
-import { InputMaybe, Pair, QueryResolvers, Scalars } from '../../../.graphclient'
-import { SushiSwapTypes } from '../../../.graphclient/sources/SushiSwap/types'
-import { getOneDayBlocks, getOneWeekBlocks } from '../../fetchers/block'
-import { FarmAPI, getFarms } from '../../fetchers/farms'
-import { page } from '../../page'
+import { InputMaybe, Pair, QueryResolvers, Scalars } from '../../.graphclient'
+import { SushiSwapTypes } from '../../.graphclient/sources/SushiSwap/types'
+import { getOneDayBlocks, getOneWeekBlocks } from '../fetchers/block'
+import { FarmAPI, getFarms } from '../fetchers/farms'
+import { page } from '../page'
 
 const blacklist = ['0xd5c5e3ca5f162165a6eff096156ec70f77f3a491']
 

@@ -1,7 +1,7 @@
 import { ChainId } from '@sushiswap/chain'
 
-import { getBuiltGraphSDK, QueryResolvers, UserWithFarm } from '../../../.graphclient'
-import { getTokenBalances } from '../../fetchers'
+import { getBuiltGraphSDK, QueryResolvers, UserWithFarm } from '../../.graphclient'
+import { getTokenBalances } from '../fetchers'
 
 export const crossChainUserWithFarms: QueryResolvers['crossChainUserWithFarms'] = async (root, args) => {
   const sdk = getBuiltGraphSDK()

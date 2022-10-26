@@ -7,7 +7,7 @@ import {
   TRIDENT_SUBGRAPH_NAME,
 } from '@sushiswap/graph-config'
 
-import { FactoryDaySnapshot, QueryResolvers } from '../../../.graphclient'
+import { FactoryDaySnapshot, QueryResolvers } from '../../.graphclient'
 
 export const crossChainFactoryDaySnapshots: QueryResolvers['crossChainFactoryDaySnapshots'] = async (
   root,

@@ -1,10 +1,4 @@
-import { ChainKey } from '@sushiswap/chain'
-import {
-  EXCHANGE_LiquidityPosition,
-  EXCHANGE_Pair,
-  EXCHANGE_Token,
-  getBuiltGraphSDK,
-} from '@sushiswap/graph-client/.graphclient'
+import { Exchange_LiquidityPosition, Exchange_Pair, Exchange_Token, getBuiltGraphSDK } from '@sushiswap/graph-client'
 import chalk from 'chalk'
 import Table from 'cli-table3'
 import numeral from 'numeral'
@@ -18,16 +12,16 @@ import {
 } from '../config'
 
 type LiquidityPositons = Array<
-  Pick<EXCHANGE_LiquidityPosition, 'liquidityTokenBalance'> & {
-    pair: Pick<EXCHANGE_Pair, 'id' | 'totalSupply' | 'reserveUSD'> & {
-      token0: Pick<EXCHANGE_Token, 'id' | 'symbol' | 'name' | 'decimals'>
-      token1: Pick<EXCHANGE_Token, 'id' | 'symbol' | 'name' | 'decimals'>
+  Pick<Exchange_LiquidityPosition, 'liquidityTokenBalance'> & {
+    pair: Pick<Exchange_Pair, 'id' | 'totalSupply' | 'reserveUSD'> & {
+      token0: Pick<Exchange_Token, 'id' | 'symbol' | 'name' | 'decimals'>
+      token1: Pick<Exchange_Token, 'id' | 'symbol' | 'name' | 'decimals'>
     }
   }
 >
 
 type Arguments = {
-  network?: string
+  network?: typeof MAKER_SUPPORTED_CHAIN_NAMES[number]
   verbose?: boolean
 }
 
@@ -39,8 +33,9 @@ interface row {
 
 export async function maker(args: Arguments) {
   if (args.network) {
-    const network = Object.values(ChainKey).find((networkName) => networkName === args.network?.toLowerCase())
-    console.log('network selected: ', network)
+    const { network } = args
+    // const network = Object.values(ChainKey).find((networkName) => networkName === args.network?.toLowerCase())
+    // console.log('network selected: ', network)
 
     if (!network || !MAKER_SUPPORTED_CHAIN_NAMES.includes(network)) {
       throw new Error('Unsupported chain. Supported chains are: '.concat(MAKER_SUPPORTED_CHAIN_NAMES.join(', ')))
@@ -82,6 +77,7 @@ export async function maker(args: Arguments) {
       const chainId = CHAIN_NAME_TO_CHAIN_ID[chainName]
       const sdk = getBuiltGraphSDK({
         chainId,
+        chainName,
         subgraphName: EXCHANGE_SUBGRAPH_NAME[chainId],
       })
       return sdk
@@ -97,20 +93,22 @@ export async function maker(args: Arguments) {
         }))
     })
 
+    // console.log({ promises: await Promise.all(promises) })
+
     const makers = await Promise.all(promises).then((data) => data.flat())
 
     console.log({ makers })
 
-    const liquidityPositions = makers.reduce<EXCHANGE_LiquidityPosition[]>((previousValue, currentValue) => {
-      return [...previousValue, ...currentValue.liquidityPositions]
-    }, [])
+    // const liquidityPositions = makers.reduce<EXCHANGE_LiquidityPosition[]>((previousValue, currentValue) => {
+    //   return [...previousValue, ...currentValue.liquidityPositions]
+    // }, [])
 
-    throbber.stopAndPersist({
-      symbol: '🍽️ ',
-      text: `Found ${
-        liquidityPositions.length
-      } liquidity positions for Sushi Maker across ${MAKER_SUPPORTED_CHAIN_NAMES.join(', ')} chains`,
-    })
+    // throbber.stopAndPersist({
+    //   symbol: '🍽️ ',
+    //   text: `Found ${
+    //     liquidityPositions.length
+    //   } liquidity positions for Sushi Maker across ${MAKER_SUPPORTED_CHAIN_NAMES.join(', ')} chains`,
+    // })
 
     // for (const chainName of MAKER_SUPPORTED_CHAIN_NAMES) {
     //   const chainId = CHAIN_NAME_TO_CHAIN_ID[chainName]

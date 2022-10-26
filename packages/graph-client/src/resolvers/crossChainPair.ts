@@ -7,10 +7,10 @@ import {
   TRIDENT_SUBGRAPH_NAME,
 } from '@sushiswap/graph-config'
 
-import { Pair, QueryResolvers } from '../../../.graphclient'
-import { SushiSwapTypes } from '../../../.graphclient/sources/SushiSwap/types'
-import { FarmAPI } from '../../farm'
-import { getOneDayBlocks, getOneWeekBlocks, getTwoDayBlocks } from '../../fetchers'
+import { Pair, QueryResolvers } from '../../.graphclient'
+import { SushiSwapTypes } from '../../.graphclient/sources/SushiSwap/types'
+import { getOneDayBlocks, getOneWeekBlocks, getTwoDayBlocks } from '../fetchers'
+import { FarmAPI } from '../fetchers/farms'
 
 export const crossChainPair: QueryResolvers['crossChainPair'] = async (root, args, context, info) => {
   const farms: FarmAPI = await fetch('https://farm.sushi.com/v0').then((res) => res.json())

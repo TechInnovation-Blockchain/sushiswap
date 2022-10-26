@@ -6,7 +6,7 @@ import {
   SUBGRAPH_HOST,
 } from '@sushiswap/graph-config'
 
-import { getBuiltGraphSDK, QueryResolvers } from '../../../.graphclient'
+import { getBuiltGraphSDK, QueryResolvers } from '../../.graphclient'
 
 export const crossChainChefUser: QueryResolvers['crossChainChefUser'] = async (root, args) => {
   const fetcher = async ({
@@ -52,7 +52,6 @@ export const crossChainChefUser: QueryResolvers['crossChainChefUser'] = async (r
       if (cur.status === 'fulfilled' && cur.value.length > 0) {
         acc.push(...cur.value)
       }
-
       return acc
     }, [] as Awaited<ReturnType<typeof fetcher>>)
   })

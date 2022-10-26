@@ -1,10 +1,10 @@
 import { formatUSD } from '@sushiswap/format'
-import { getBuiltGraphSDK } from '@sushiswap/graph-client/.graphclient'
+import { getBuiltGraphSDK } from '@sushiswap/graph-client'
 
 import { CHAIN_NAME_TO_CHAIN_ID, EXCHANGE_SUBGRAPH_NAME, MAKER_ADDRESS } from '../config'
 
 type Arguments = {
-  network?: string
+  network?: keyof typeof CHAIN_NAME_TO_CHAIN_ID
   verbose?: boolean
 }
 

@@ -7,8 +7,8 @@ import {
   TRIDENT_SUBGRAPH_NAME,
 } from '@sushiswap/graph-config'
 
-import { LiquidityPosition, QueryResolvers } from '../../../.graphclient'
-import { FarmAPI } from '../../farm'
+import { LiquidityPosition, QueryResolvers } from '../../.graphclient'
+import { FarmAPI } from '../fetchers/farms'
 
 export const crossChainLiquidityPositions: QueryResolvers['crossChainLiquidityPositions'] = async (
   root,

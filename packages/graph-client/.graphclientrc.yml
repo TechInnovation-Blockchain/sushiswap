@@ -151,21 +151,25 @@ additionalTypeDefs: |
     ): [Pair!]!
     crossChainPair(id: ID!, now: Int!, chainId: Int!): Pair
     crossChainLiquidityPositions(
-      block: Block_height,
+      first: Int,
+      skip: Int, 
       where: LiquidityPosition_filter,
-      chainIds: [Int!]!,
+      orderBy: LiquidityPosition_orderBy, 
+      orderDirection: OrderDirection, 
+      block: Block_height,
+      chainIds: [Int!]!
     ): [LiquidityPosition!]!
     crossChainChefUser(
       first: Int,
       skip: Int,
       where: User_filter,
       block: Block_height,
-      chainIds: [Int!]!,
+      chainIds: [Int!]!
     ): [ChefUser]
     crossChainUserWithFarms(
       id: ID!,
       block: Block_height,
-      chainIds: [Int!]!,
+      chainIds: [Int!]!
     ): [UserWithFarm!]
     crossChainToken(id: ID!, now: Int!, chainId: Int!): Token!
     crossChainTokens(
@@ -176,7 +180,7 @@ additionalTypeDefs: |
       orderDirection: OrderDirection,
       block: Block_height,
       pagination: Pagination,
-      chainIds: [Int!]! 
+      chainIds: [Int!]!
     ): [Token!]!
     crossChainStats(
       first: Int,
@@ -185,23 +189,13 @@ additionalTypeDefs: |
       orderBy: Pair_orderBy, 
       orderDirection: OrderDirection,
       block: Block_height,
-      chainIds: [Int!]!, 
+      chainIds: [Int!]!,
       now: Int!
     ): [Pair!]!
   }
-
 additionalResolvers:
-  - .graphclient/resolvers/bentobox.js
-  - .graphclient/resolvers/blocks.js
-  - .graphclient/resolvers/sushiswap.js
-
+  - '.graphclient/resolvers/index.js'
 documents:
-  - './src/queries/*.graphql'
-  # - './queries/bar.graphql'
-  # - './queries/bentobox.graphql'
-  # - './queries/blocks.graphql'
-  # - './queries/exchange.graphql'
-  # - './queries/masterchef.graphql'
-  # - './queries/sushiswap.graphql'
+  - './src/**/*.graphql'
 codegen:
   contextType: 'MeshContext & { chainId: string; chainName: string; chainShortName: string; subgraphName: string; subgraphHost: string }'

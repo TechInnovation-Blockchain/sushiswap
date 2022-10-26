@@ -7,8 +7,8 @@ import {
   TRIDENT_SUBGRAPH_NAME,
 } from '@sushiswap/graph-config'
 
-import { QueryResolvers, Token } from '../../../.graphclient'
-import { page } from '../../page'
+import { QueryResolvers, Token } from '../../.graphclient'
+import { page } from '../page'
 
 export const crossChainTokens: QueryResolvers['crossChainTokens'] = async (root, args, context, info) => {
   return Promise.all([
