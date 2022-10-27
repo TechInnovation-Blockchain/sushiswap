@@ -1,0 +1,59 @@
+fragment LegacyPair on Pair {
+  id
+  name
+  token0 {
+    id
+    name
+    symbol
+    decimals
+  }
+  token1 {
+    id
+    name
+    symbol
+    decimals
+  }
+  totalSupply
+  reserveUSD
+  volumeUSD
+}
+
+query ExchangePairs(
+  $skip: Int = 0, 
+  $first: Int = 100,
+  $where: Pair_filter, 
+  # $block: Block_height
+) {
+  pairs: pairs(
+    skip: $skip,
+    first: $first, 
+    where: $where,
+    # block: $block
+  ) {
+    ...LegacyPair
+  }
+}
+
+query ExchangeLiquidityPositions(
+  $skip: Int = 0
+  $first: Int = 100
+  # $orderBy: LiquidityPosition_orderBy,
+  # $orderDirection:  OrderDirection,
+  $where: LiquidityPosition_filter,
+  # $block: Block_height
+) {
+  liquidityPositions: liquidityPositions(
+    skip: $skip,
+    first: $first,
+    # orderBy: $orderBy,
+    # orderDirection: $orderDirection,
+    where: $where,
+    # block: $block,
+  ) {
+    id
+    liquidityTokenBalance
+    pair {
+      ...LegacyPair
+    }
+  }
+}

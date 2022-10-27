@@ -1,0 +1,350 @@
+sources:
+  - name: Deprecated
+    handler:
+      graphql:
+        endpoint: https://{context.subgraphHost:api.thegraph.com/subgraphs/name}/{context.subgraphName:sushiswap/exchange-ethereum}
+        retry: 3
+    transforms:
+      - autoPagination:
+          validateSchema: true
+          # DEFAULTS
+          # limitOfRecords: 1000
+          # skipArgumentLimit: 5000
+      - autoTypeMerging: true
+  # - name: Bar
+  #   handler:
+  #     graphql:
+  #       endpoint: "https://api.thegraph.com/subgraphs/name/sushi-labs/xsushi"
+  #       retry: 3
+  # - name: BentoBox
+  #   handler:
+  #     graphql:
+  #       endpoint: https://{context.subgraphHost:api.thegraph.com/subgraphs/name}/{context.subgraphName:matthewlilley/bentobox-ethereum}
+  #       retry: 3
+  #   transforms:
+  #     - autoPagination:
+  #         validateSchema: true
+  #     - autoTypeMerging: true
+
+
+  #   transforms:
+  #     - autoPagination:
+  #         validateSchema: true
+  - name: Blocks
+    handler:
+      graphql:
+        endpoint: https://{context.subgraphHost:api.thegraph.com/subgraphs/name}/{context.subgraphName:blocklytics/ethereum-blocks}
+        retry: 3
+    transforms:
+      - autoPagination:
+          validateSchema: true
+  # - name: MasterChefV1
+  #   handler:
+  #     graphql:
+  #       endpoint: https://api.thegraph.com/subgraphs/name/jiro-ono/masterchef-staging
+  #       retry: 3
+  #   transforms:
+  #     - prefix:
+  #         value: MASTERCHEF_V1_
+  #         includeRootOperations: true
+  #         includeTypes: false
+  #         ignore: 
+  #           - _SubgraphErrorPolicy_  
+  #     - rename:
+  #         mode: wrap
+  #         renames:
+  #           - from:
+  #               type:   Pool
+  #               field:  owner
+  #             to:
+  #               type:   Pool
+  #               field:  masterChef
+  #           - from:
+  #               type:   Pool
+  #               field:  balance
+  #             to:
+  #               type:   Pool
+  #               field:  slpBalance
+  #     - autoPagination:
+  #         validateSchema: true
+  # - name: MasterChefV2
+  #   handler:
+  #     graphql:
+  #       endpoint: https://api.thegraph.com/subgraphs/name/sushiswap/master-chefv2
+  #       retry: 3
+  #   transforms:
+  #     - prefix:
+  #         value: MASTERCHEF_V2_
+  #         includeRootOperations: true
+  #         includeTypes: false
+  #         ignore: 
+  #           - _SubgraphErrorPolicy_
+  #     - autoPagination:
+  #         validateSchema: true
+  # - name: SushiSwap
+  #   handler:
+  #     graphql:
+  #       endpoint: https://{context.subgraphHost:api.thegraph.com/subgraphs/name}/{context.subgraphName:subgraph-qa/sushiswap-ethereum}
+  #       retry: 3
+  #   transforms:
+  #     - autoPagination:
+  #         validateSchema: true
+  # - name: Trident
+  #   handler:
+  #     graphql:
+  #       endpoint: https://{context.subgraphHost:api.thegraph.com/subgraphs/name}/{context.subgraphName:sushiswap/trident-optimism}
+  #       retry: 3
+  #   transforms:
+  #     - autoPagination:
+  #         validateSchema: true
+
+# sources: !includes ./sources
+
+# additionalTypeDefs: |
+#   input Pagination {
+#     pageIndex: Int! = 0
+#     pageSize: Int! = 20
+#   }
+#   type RewardToken {
+#     address: String!
+#     symbol: String!
+#     decimals: Int!
+#   }
+#   type Incentive {
+#     apr: BigDecimal!
+#     rewardPerDay: BigDecimal!
+#     rewardToken: RewardToken!
+#     rewarderAddress: String!
+#     rewarderType: String!
+#   }
+#   type Farm {
+#     id: ID!
+#     incentives: [Incentive!]!
+#     chefType: String!
+#     poolType: String!
+#   }
+#   type ChefUserPool {
+#     id: BigInt!
+#     pair: String!
+#   }
+#   type ChefUser {
+#     id: ID!
+#     address: String!
+#     amount: BigInt!
+#     pool: ChefUserPool
+#     chainId: Int!
+#     chainName: String!
+#   }
+#   type UserWithFarm {
+#     id: ID!
+#     unstakedBalance: BigInt!
+#     stakedBalance: BigInt!
+#     valueUSD: BigDecimal!
+#     pair: Pair!
+#     chainId: Int!
+#     chainName: String!
+#   }
+#   extend type Block {
+#     chainId: Int!
+#   }
+#   extend type Rebase {
+#     chainId: Int!
+#   }
+#   extend type Bundle {
+#     chainId: Int!
+#   }
+#   extend type Factory {
+#     chainId: Int!
+#   }
+#   extend type FactoryDaySnapshot {
+#     chainId: Int!
+#     chainName: String!
+#     chainShortName: String!
+#   }
+#   extend type LiquidityPosition {
+#     chainId: Int!
+#     chainName: String!
+#     chainShortName: String!
+#   }
+#   extend type Pair {
+#     chainId: Int!
+#     chainName: String!
+#     chainShortName: String!
+#     liquidity1dChange: BigDecimal
+#     liquidity1wChange: BigDecimal
+#     volume1d: BigDecimal!
+#     volume1dChange: BigDecimal
+#     volume1w: BigDecimal!
+#     fees1d: BigDecimal!
+#     fees1w: BigDecimal!
+#     txCount1d: BigInt!
+#     txCount1dChange: BigDecimal
+#     txCount1w: BigInt!
+#     farm: Farm
+#     incentiveApr: BigDecimal!
+#     feeApr: BigDecimal!
+#   }
+#   extend type User {
+#     chainId: Int!
+#     chainName: String!
+#   }
+#   extend type Token {
+#     chainId: Int!
+#     chainName: String!
+#     chainShortName: String!
+#     source: String!
+#   }
+#   extend type Query {
+#     # BLOCKS
+#     crossChainBlocks(
+#       first: Int,
+#       skip: Int,
+#       where: Block_filter,
+#       orderBy: Block_orderBy,
+#       orderDirection: OrderDirection,
+#       chainIds: [Int!]!
+#     ): [Block!]!
+#     oneDayBlocks(
+#       chainIds: [Int!]!
+#     ): [Block!]!
+#     twoDayBlocks(
+#       chainIds: [Int!]!
+#     ): [Block!]!
+#     oneWeekBlocks(
+#       chainIds: [Int!]!
+#     ): [Block!]!
+#     customBlocks(
+#       timestamp: Int!
+#       chainIds: [Int!]!
+#     ): [Block!]!
+#     # BENTOBOX
+#     crossChainRebases(
+#       first: Int!,
+#       chainIds: [Int!]!
+#     ): [Rebase!]!
+#     # EXCHANGE
+#     crossChainBundles(
+#       chainIds: [Int!]!
+#     ): [Bundle!]!
+#     crossChainFactories(
+#       chainIds: [Int!]!
+#     ): [Factory!]!
+#     crossChainFactoryDaySnapshots(
+#       first: Int, 
+#       skip: Int, 
+#       where: FactoryDaySnapshot_filter, 
+#       orderBy: FactoryDaySnapshot_orderBy, 
+#       orderDirection: OrderDirection, 
+#       block: Block_height, 
+#       chainIds: [Int!]!
+#     ): [FactoryDaySnapshot!]!
+#     crossChainPairs(
+#       first: Int,
+#       skip: Int, 
+#       where: Pair_filter, 
+#       orderBy: Pair_orderBy, 
+#       orderDirection: OrderDirection, 
+#       block: Block_height,
+#       pagination: Pagination,
+#       chainIds: [Int!]!,
+#       farmsOnly: Boolean
+#     ): [Pair!]!
+#     crossChainPair(id: ID!, now: Int!, chainId: Int!): Pair
+#     crossChainLiquidityPositions(
+#       first: Int,
+#       skip: Int, 
+#       where: LiquidityPosition_filter,
+#       orderBy: LiquidityPosition_orderBy, 
+#       orderDirection: OrderDirection, 
+#       block: Block_height,
+#       chainIds: [Int!]!
+#     ): [LiquidityPosition!]!
+#     crossChainChefUser(
+#       first: Int,
+#       skip: Int,
+#       where: User_filter,
+#       block: Block_height,
+#       chainIds: [Int!]!
+#     ): [ChefUser]
+#     crossChainUserWithFarms(
+#       id: ID!,
+#       block: Block_height,
+#       chainIds: [Int!]!
+#     ): [UserWithFarm!]
+#     crossChainToken(id: ID!, now: Int!, chainId: Int!): Token!
+#     crossChainTokens(
+#       first: Int,
+#       skip: Int,
+#       where: Token_filter,
+#       orderBy: Token_orderBy,
+#       orderDirection: OrderDirection,
+#       block: Block_height,
+#       pagination: Pagination,
+#       chainIds: [Int!]!
+#     ): [Token!]!
+#     crossChainStats(
+#       first: Int,
+#       skip: Int,
+#       where: Pair_filter,
+#       orderBy: Pair_orderBy, 
+#       orderDirection: OrderDirection,
+#       block: Block_height,
+#       chainIds: [Int!]!,
+#       now: Int!
+#     ): [Pair!]!
+#   }
+
+# documents:
+#   - './queries/*.graphql'
+
+# additionalTypeDefs: |
+#   extend type Rebase {
+#     chainId: String
+#   }
+#   extend type Query {
+#     crossChainRebases(first: Int!, chainIds: [Int!]!): [Rebase!]!
+#   }
+
+additionalTypeDefs: |
+  extend type Block {
+    chainId: Int!
+  }
+  extend type Query {
+    crossChainBlocks(
+      first: Int,
+      skip: Int,
+      where: Block_filter,
+      orderBy: Block_orderBy,
+      orderDirection: OrderDirection,
+      chainIds: [Int!]!
+    ): [Block!]!
+    oneDayBlocks(
+      chainIds: [Int!]!
+    ): [Block!]!
+    twoDayBlocks(
+      chainIds: [Int!]!
+    ): [Block!]!
+    oneWeekBlocks(
+      chainIds: [Int!]!
+    ): [Block!]!
+    customBlocks(
+      timestamp: Int!
+      chainIds: [Int!]!
+    ): [Block!]!
+  }
+
+# additionalResolvers:
+#   - .graphclient/resolvers/blocks.js
+
+documents:
+  # - './src/**/*.graphql'
+  # - './src/**/*.{ts,tsx,js,jsx}'
+  # DEPRECATED SUBGRAPH QUERIES
+  - './queries/deprecated.graphql'
+  - './queries/blocks.graphql'
+  # PRODUCT SUBGRAPH QUERIES
+  # - './queries/bar.graphql'
+  # - './queries/bentobox.graphql'
+  
+codegen:
+  contextType: 'MeshContext & { chainId: string; chainName: string; chainShortName: string; subgraphName: string; subgraphHost: string }'

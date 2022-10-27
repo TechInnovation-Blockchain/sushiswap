@@ -1,0 +1,40 @@
+query Rebase($id: ID!) {
+  rebase(id: $id) {
+    id
+    base
+    elastic
+  }
+}
+query Rebases(
+  $skip: Int = 0,
+  $first: Int = 100,
+  $where: Rebase_filter
+) {
+  rebases(
+    skip: $skip,
+    first: $first, 
+    where: $where
+  ) {
+    id
+    base
+    elastic
+  }
+}
+
+query CrossChainRebases(
+  $skip: Int = 0,
+  $first: Int = 100,
+  $where: Rebase_filter, 
+  $chainIds: [Int!]!
+) {
+  crossChainRebases(
+    skip: $skip,
+    first: $first, 
+    where: $where,
+    chainIds: $chainIds
+  ) {
+    id
+    base
+    elastic
+  }
+}

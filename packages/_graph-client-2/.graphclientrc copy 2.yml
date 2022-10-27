@@ -1,0 +1,103 @@
+# sources: !includes ./src/sources
+# sources: !includes ./src/sources
+
+# sources:
+#   - name: Blocks
+#     handler:
+#       graphql:
+#         endpoint: https://{context.subgraphHost:api.thegraph.com/subgraphs/name}/{context.subgraphName:blocklytics/ethereum-blocks}
+#     transforms:
+#       - addSourceName: true
+#       - autoPagination:
+#       - autoTypeMerging: true
+#   - name: Exchange
+#     handler:
+#       graphql:
+#         endpoint: https://{context.subgraphHost:api.thegraph.com/subgraphs/name}/{context.subgraphName:sushiswap/exchange-ethereum}
+#     transforms:
+#       - addSourceName: true
+#       - autoPagination:
+#       - autoTypeMerging: true
+          # validateSchema: true
+          # limitOfRecords: 10
+      # - autoTypeMerging: true
+  # - name: MasterChefV1
+  #   handler:
+  #     graphql:
+  #       endpoint: https://api.thegraph.com/subgraphs/name/jiro-ono/masterchef-staging
+  #       retry: 3
+  #   transforms:
+  #     - addSourceName: true
+  #     - prefix:
+  #         value: MASTERCHEF_V1_
+  #         includeRootOperations: true
+  #         includeTypes: false
+  #         ignore: 
+  #           - _SubgraphErrorPolicy_  
+  #     - rename:
+  #         mode: wrap
+  #         renames:
+  #           - from:
+  #               type:   Pool
+  #               field:  owner
+  #             to:
+  #               type:   Pool
+  #               field:  masterChef
+  #           - from:
+  #               type:   Pool
+  #               field:  balance
+  #             to:
+  #               type:   Pool
+  #               field:  slpBalance
+# additionalTypeDefs: |
+#   extend type Block {
+#     chainId: Int!
+#   }
+#   extend type Query {
+#     crossChainBlocks(
+#       first: Int,
+#       skip: Int,
+#       where: Block_filter,
+#       orderBy: Block_orderBy,
+#       orderDirection: OrderDirection,
+#       chainIds: [Int!]!
+#     ): [Block!]!
+#     oneDayBlocks(
+#       chainIds: [Int!]!
+#     ): [Block!]!
+#     twoDayBlocks(
+#       chainIds: [Int!]!
+#     ): [Block!]!
+#     oneWeekBlocks(
+#       chainIds: [Int!]!
+#     ): [Block!]!
+#     customBlocks(
+#       timestamp: Int!
+#       chainIds: [Int!]!
+#     ): [Block!]!
+#   }
+
+additionalTypeDefs: |
+  extend schema {
+    query: Query
+  }
+  extend type Rebase {
+    chainId: Int!
+  }
+  extend type Query {
+    crossChainRebases(
+      skip: Int = 0
+      first: Int = 100
+      where: Rebase_filter
+      chainIds: [Int!]!
+    ): [Rebase!]!
+  }
+
+additionalResolvers:
+  - './src/resolvers.{ts,js}'
+  
+documents:
+  - './src/queries/*.graphql'
+
+codegen:
+  contextType: 'MeshContext & { chainId: string; chainName: string; chainShortName: string; subgraphName: string; subgraphHost: string }'
