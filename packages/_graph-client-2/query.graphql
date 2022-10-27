@@ -1,0 +1,13 @@
+query getLiquidityPositions(
+  $skip: Int = 0
+  $first: Int = 100
+  $where: LiquidityPosition_filter
+) {
+  liquidityPositions(
+    skip: $skip,
+    first: $first,
+    where: $where
+  ) {
+    id
+  }
+}

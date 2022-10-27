@@ -77,8 +77,10 @@ export const SUBGRAPH_HOST = {
   [ChainId.ARBITRUM]: GRAPH_HOST,
   [ChainId.AVALANCHE]: GRAPH_HOST,
   [ChainId.BSC]: GRAPH_HOST,
+  [ChainId.CELO]: GRAPH_HOST,
   [ChainId.ETHEREUM]: GRAPH_HOST,
   [ChainId.FANTOM]: GRAPH_HOST,
+  [ChainId.FUSE]: GRAPH_HOST,
   [ChainId.GNOSIS]: GRAPH_HOST,
   [ChainId.GÖRLI]: GRAPH_HOST,
   [ChainId.HARMONY]: GRAPH_HOST,
@@ -89,16 +91,16 @@ export const SUBGRAPH_HOST = {
 } as const
 
 export const EXCHANGE_SUBGRAPH_NAME = {
-  [ChainId.AVALANCHE]: 'sushiswap/exchange-avalanche',
   [ChainId.ARBITRUM]: 'sushiswap/exchange-arbitrum-backup',
+  [ChainId.AVALANCHE]: 'sushiswap/exchange-avalanche',
   [ChainId.BSC]: 'sushiswap/bsc-exchange',
   [ChainId.CELO]: 'sushiswap/exchange-celo',
-  [ChainId.ETHEREUM]: 'sushiswap/exchange-ethereum',
+  [ChainId.ETHEREUM]: 'sushiswap/exchange',
   [ChainId.FANTOM]: 'sushiswap/exchange-fantom',
   [ChainId.FUSE]: 'sushiswap/exchange-fuse',
   [ChainId.GNOSIS]: 'sushiswap/exchange-gnosis',
+  [ChainId.HARMONY]: 'sushiswap/exchange-harmony',
   [ChainId.MOONBEAM]: 'sushiswap/exchange-moonbeam',
   [ChainId.MOONRIVER]: 'sushiswap/exchange-moonriver',
   [ChainId.POLYGON]: 'sushiswap/matic-exchange',
-  [ChainId.HARMONY]: 'sushiswap/exchange-harmony',
 } as const

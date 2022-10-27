@@ -1,0 +1,12 @@
+sources:
+  - name: deprecated
+    handler:
+      graphql:
+        endpoint: https://api.thegraph.com/subgraphs/name/sushiswap/exchange
+    transforms:
+      - autoPagination:
+          validateSchema: true
+          limitOfRecords: 10
+      - autoTypeMerging: true
+documents:
+  - ./query.graphql

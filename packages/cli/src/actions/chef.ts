@@ -18,7 +18,7 @@ export async function chef(args: Arguments) {
 
   const { MASTERCHEF_V1_pools, MASTERCHEF_V2_pools } = await sdk.MasterChefPools()
 
-  const { pairs } = await sdk.ExchangePairs({
+  const { pairs } = await sdk.deprecated_Pairs({
     where: {
       id_in: [...MASTERCHEF_V1_pools, ...MASTERCHEF_V2_pools].reduce<string[]>(
         (previousValue, currentValue) => [...previousValue, currentValue.pair],

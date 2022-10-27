@@ -81,7 +81,7 @@ export const SUBGRAPH_HOST: Record<number, string> = {
   [ChainId.KOVAN]: '',
 }
 
-export const BENTOBOX_SUBGRAPH_NAME: Record<number, string> = {
+export const BENTOBOX_SUBGRAPH_NAME = {
   [ChainId.ETHEREUM]: 'sushiswap/bentobox-ethereum',
   [ChainId.POLYGON]: 'sushiswap/bentobox-polygon',
   [ChainId.AVALANCHE]: 'sushiswap/bentobox-avalanche',
@@ -95,7 +95,7 @@ export const BENTOBOX_SUBGRAPH_NAME: Record<number, string> = {
   [ChainId.OPTIMISM]: 'sushiswap/bentobox-optimism',
   [ChainId.HARMONY]: 'sushiswap/bentobox-harmony',
   [ChainId.KAVA]: 'sushiswap/bentobox-kava',
-}
+} as const
 
 export const BLOCKS_SUBGRAPH_NAME: Record<number, string> = {
   [ChainId.ETHEREUM]: 'blocklytics/ethereum-blocks',

@@ -1,0 +1,63 @@
+{
+  "name": "@sushiswap/graph-client-2",
+  "version": "0.0.0",
+  "private": true,
+  "sideEffects": false,
+  "description": "Sushi Graph Client",
+  "keywords": [
+    "sushi",
+    "graph",
+    "client"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sushiswap/sushiswap.git",
+    "directory": "packages/graph-client-2"
+  },
+  "license": "MIT",
+  "author": "Matthew Lilley <hello@matthewLilley.com>",
+  "main": ".graphclient/index.js",
+  "module": ".graphclient/index.mjs",
+  "source": ".graphclient/index.ts",
+  "typings": ".graphclient/index.d.ts",
+  "scripts": {
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "dev": "graphclient serve-dev",
+    "build": "graphclient build --fileType json",
+    "lint": "TIMING=1 eslint . --fix",
+    "prepublishOnly": "pnpm build",
+    "test": "jest --passWithNoTests",
+    "validate": "graphclient validate"
+  },
+  "jest": {
+    "preset": "@sushiswap/jest-config/node"
+  },
+  "dependencies": {
+    "@graphprotocol/client-cli": "2.2.15",
+    "@graphql-mesh/utils": "latest",
+    "@graphql-mesh/cache-localforage": "latest",
+    "@whatwg-node/fetch": "latest",
+    "@graphql-mesh/graphql": "latest",
+    "@graphprotocol/client-auto-pagination": "latest",
+    "@graphprotocol/client-auto-type-merging": "latest",
+    "@graphql-mesh/merger-bare": "latest",
+    "@graphql-mesh/http": "latest",
+    "@graphql-mesh/runtime": "latest",
+    "@graphql-mesh/store": "latest",
+    "@graphql-mesh/cross-helpers": "latest",
+    "tslib": "latest",
+    "graphql": "16.6.0"
+  },
+  "devDependencies": {
+    "@sushiswap/eslint-config": "workspace:*",
+    "@sushiswap/jest-config": "workspace:*",
+    "@sushiswap/prettier-config": "workspace:*",
+    "@sushiswap/typescript-config": "workspace:*",
+    "@types/node": "17.0.26",
+    "@types/jest": "^27.5.1",
+    "eslint": "^8.20.0",
+    "jest": "^28.1.0",
+    "tsup": "^6.2.0",
+    "typescript": "4.8.2"
+  }
+}

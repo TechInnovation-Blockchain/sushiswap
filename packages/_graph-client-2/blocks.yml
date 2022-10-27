@@ -7,4 +7,3 @@ transforms:
   - addSourceName: true
   - autoPagination:
       validateSchema: true
-  # - autoTypeMerging: true
