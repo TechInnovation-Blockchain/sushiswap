@@ -12,7 +12,6 @@
   "license": "MIT",
   "author": "Matthew Lilley <hello@matthewLilley.com>",
   "scripts": {
-    "start": "graphclient start",
     "lint": "TIMING=1 eslint --fix ."
   },
   "dependencies": {
