@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@sushiswap/graph-client": "workspace:*",
-    "@vercel/node": "^1.14.1"
+    "@vercel/node": "^2.5.26"
   },
   "devDependencies": {
     "@sushiswap/eslint-config": "workspace:*",
