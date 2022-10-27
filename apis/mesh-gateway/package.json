@@ -15,7 +15,7 @@
     "lint": "TIMING=1 eslint --fix ."
   },
   "dependencies": {
-    "@sushiswap/graph-client": "workspace:*",
+    "@sushiswap/graph-client": "0.2.2",
     "@vercel/node": "^2.5.26"
   },
   "devDependencies": {
