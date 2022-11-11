@@ -9,6 +9,7 @@ import { resolvers as factories } from './factories'
 import { resolvers as liquidityPositions } from './liquidity-positions'
 import { resolvers as masterchef } from './masterchef'
 import { resolvers as pairs } from './pairs'
+import { resolvers as router } from './router'
 import { resolvers as tokens } from './tokens'
 import { resolvers as user } from './user'
 
@@ -24,4 +25,5 @@ export const resolvers: Resolvers = mergeResolvers([
   pairs,
   tokens,
   user,
+  router,
 ])

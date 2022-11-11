@@ -9,6 +9,29 @@ fragment TokenFields on Token {
   feesUSD
   price {
     derivedNative
+    lastUsdPrice
+  }
+}
+
+query TokensByChainId(
+  $first: Int
+  $skip: Int
+  $where: Token_filter
+  $orderBy: Token_orderBy
+  $orderDirection: OrderDirection
+  $block: Block_height
+  $chainId: Int!
+) {
+  tokens: tokensByChainId(
+    first: $first
+    skip: $skip
+    where: $where,
+    orderBy: $orderBy
+    orderDirection: $orderDirection
+    block: $block
+    chainId: $chainId
+  ) {
+    ...TokenFields
   }
 }
 

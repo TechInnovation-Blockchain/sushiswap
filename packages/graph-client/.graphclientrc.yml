@@ -1,5 +1,21 @@
 sources:
 
+  - name: Router
+    handler:
+      graphql:
+        endpoint: https://api.thegraph.com/subgraphs/name/olastenberg/router-ethereum
+        retry: 3
+    transforms:
+      - addSourceName: true
+      - autoPagination:
+          validateSchema: true
+      - prefix:
+          value: ROUTER_
+          includeRootOperations: true
+          includeTypes: false
+          ignore: 
+            - _SubgraphErrorPolicy_
+
   - name: xSUSHI
     handler:
       graphql:
@@ -303,8 +319,12 @@ additionalTypeDefs: |
   extend type LiquidityPosition {
     chainId: Int!
   }
+  type PositiveSlippage {
+    positiveSlippage: BigDecimal!
+  }
   # Query Extensions
   extend type Query {
+    positiveSlippage: PositiveSlippage!
     bundlesByChainIds(
       chainIds: [Int!]!
     ): [Bundle!]!
@@ -420,6 +440,25 @@ additionalTypeDefs: |
       ids: [ID!]!
       block: Block_height
     ): [Token!]!
+    tokenPricesByChainIds(
+      skip: Int = 0
+      first: Int = 100
+      where: TokenPrice_filter
+      orderBy: TokenPrice_orderBy
+      orderDirection: OrderDirection
+      block: Block_height
+      pagination: Pagination
+      chainIds: [Int!]! 
+    ): [TokenPrice!]!
+    tokenPricesByChainId(
+      skip: Int = 0
+      first: Int = 100
+      where: TokenPrice_filter
+      orderBy: TokenPrice_orderBy
+      orderDirection: OrderDirection
+      block: Block_height
+      chainId: Int!
+    ): [TokenPrice!]!
     # TODO: REFACTOR BELOW
     crossChainChefUser(
       skip: Int = 0

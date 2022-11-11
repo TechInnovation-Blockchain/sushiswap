@@ -1,0 +1,48 @@
+fragment RouterSwapFields on Swap {
+  id
+  amountOutMin
+  amountOut
+  positiveSlippage
+  txFrom
+  txTo
+  tokenIn {
+    id
+    symbol
+    decimals
+    decimalsSuccess
+  }
+  tokenOut {
+    id
+    symbol
+    decimals
+    decimalsSuccess
+  }
+  createdAtBlock
+  createdAtTimestamp
+}
+
+query RouterSwaps(
+  $skip: Int = 0
+  $first: Int = 100
+  $where: Swap_filter
+  $orderBy: Swap_orderBy
+  $orderDirection: OrderDirection
+  $block: Block_height
+) {
+  swaps: ROUTER_swaps(
+    first: $first
+    skip: $skip
+    where: $where,
+    orderBy: $orderBy
+    orderDirection: $orderDirection
+    block: $block
+  ) {
+    ...RouterSwapFields
+  }
+}
+
+query PositiveSlippage {
+  positiveSlippage {
+    positiveSlippage
+  }
+}

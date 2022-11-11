@@ -1,0 +1,53 @@
+fragment TokenPriceFields on TokenPrice {
+  id
+  token {
+    id
+  }
+  lastUsdPrice
+  derivedNative
+}
+
+query TokenPricesByChainId(
+  $skip: Int = 0
+  $first: Int = 100
+  $where: TokenPrice_filter
+  $orderBy: TokenPrice_orderBy
+  $orderDirection: OrderDirection
+  $block: Block_height
+  $chainId: Int!
+) {
+  prices: tokenPricesByChainId(
+    first: $first
+    skip: $skip
+    where: $where,
+    orderBy: $orderBy
+    orderDirection: $orderDirection
+    block: $block
+    chainId: $chainId
+  ) {
+    ...TokenPriceFields
+  }
+}
+
+
+query TokenPricesByChainIds(
+  $skip: Int = 0
+  $first: Int = 100
+  $where: TokenPrice_filter
+  $orderBy: TokenPrice_orderBy
+  $orderDirection: OrderDirection
+  $block: Block_height
+  $chainIds: [Int!]!
+) {
+  prices: tokenPricesByChainIds(
+    first: $first,
+    skip: $skip,
+    where: $where,
+    orderBy: $orderBy,
+    orderDirection: $orderDirection,
+    block: $block,
+    chainIds: $chainIds,
+  ) {
+    ...TokenPriceFields
+  }
+}
