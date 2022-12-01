@@ -1,4 +1,5 @@
 export { bentoBoxV1Abi } from './BentoBoxV1'
+export { complexRewarderTimeAbi } from './ComplexRewarderTime'
 export { constantProductPoolAbi } from './ConstantProductPool'
 export { constantProductPoolFactoryAbi } from './ConstantProductPoolFactory'
 export { masterChefV1Abi } from './MasterChef'

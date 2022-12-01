@@ -1,7 +1,7 @@
 import { ChainId } from '@sushiswap/chain'
-import { ERC20 } from '@sushiswap/core'
 import { SUBGRAPH_HOST, SUSHISWAP_SUBGRAPH_NAME, TRIDENT_SUBGRAPH_NAME } from '@sushiswap/graph-config'
-import { erc20ABI, readContracts, ReadContractsConfig } from '@wagmi/core'
+import { Address, erc20ABI, readContracts } from '@wagmi/core'
+import { BigNumber } from 'ethers'
 
 import { divBigNumberToNumber } from './utils'
 
@@ -15,7 +15,7 @@ interface Token {
 
 const getExchangeTokens = async (ids: string[], chainId: ChainId): Promise<Token[]> => {
   const { getBuiltGraphSDK } = await import('../../../.graphclient')
-  const subgraphName = SUSHISWAP_SUBGRAPH_NAME[chainId]
+  const subgraphName = (SUSHISWAP_SUBGRAPH_NAME as Record<string, string>)[chainId]
   if (!subgraphName) return []
   const sdk = getBuiltGraphSDK({ host: SUBGRAPH_HOST[chainId], name: subgraphName })
 
@@ -33,7 +33,7 @@ const getExchangeTokens = async (ids: string[], chainId: ChainId): Promise<Token
 
 const getTridentTokens = async (ids: string[], chainId: ChainId): Promise<Token[]> => {
   const { getBuiltGraphSDK } = await import('../../../.graphclient')
-  const subgraphName = TRIDENT_SUBGRAPH_NAME[chainId]
+  const subgraphName = (TRIDENT_SUBGRAPH_NAME as Record<string, string>)[chainId]
   if (!subgraphName) return []
   const sdk = getBuiltGraphSDK({ host: SUBGRAPH_HOST[chainId], name: subgraphName })
 
@@ -70,28 +70,34 @@ export const getTokens = async (ids: string[], chainId: ChainId) => {
 }
 
 export async function getTokenBalancesOf(tokens: string[], address: string, chainId: ChainId) {
-  const balanceOfCalls: ReadContractsConfig['contracts'] = tokens.map((token) => ({
-    address: token,
-    args: [address],
-    chainId: chainId,
-    abi: erc20ABI,
-    functionName: 'balanceOf',
-  }))
+  const balanceOfCalls = tokens.map(
+    (token) =>
+      ({
+        address: token as Address,
+        args: [address as Address],
+        chainId: chainId,
+        abi: erc20ABI,
+        functionName: 'balanceOf',
+      } as const)
+  )
 
-  const decimalCalls: ReadContractsConfig['contracts'] = tokens.map((token) => ({
-    address: token,
-    chainId: chainId,
-    abi: erc20ABI,
-    functionName: 'decimals',
-  }))
+  const decimalCalls = tokens.map(
+    (token) =>
+      ({
+        address: token as Address,
+        chainId: chainId,
+        abi: erc20ABI,
+        functionName: 'decimals',
+      } as const)
+  )
 
-  const result = await readContracts({
+  const result = (await readContracts({
     allowFailure: true,
     contracts: [...balanceOfCalls, ...decimalCalls],
-  })
+  })) as unknown as BigNumber[]
 
-  const balancesOf = result.splice(0, balanceOfCalls.length) as unknown as Awaited<ReturnType<ERC20['balanceOf']>>[]
-  const decimals = result.splice(0, decimalCalls.length) as unknown as number[]
+  const balancesOf = result.splice(0, balanceOfCalls.length)
+  const decimals = result.splice(0, decimalCalls.length)
 
   return tokens.map((token, i) => ({
     token,

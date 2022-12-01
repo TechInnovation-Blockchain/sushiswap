@@ -1,31 +1,29 @@
 import { ChainId } from '@sushiswap/chain'
-import { ComplexRewarderTime, MiniChefV2 } from '@sushiswap/core'
-import ComplexRewarderTimeABI from '@sushiswap/core/abi/ComplexRewarderTime.json'
-import MiniChefV2ABI from '@sushiswap/core/abi/MiniChefV2.json'
+import { complexRewarderTimeAbi, miniChefAbi } from '@sushiswap/abi'
 import { MINICHEF_SUBGRAPH_NAME, SUBGRAPH_HOST } from '@sushiswap/graph-config'
-import { ReadContractConfig, readContracts, ReadContractsConfig } from '@wagmi/core'
-import { readContract } from '@wagmi/core'
+import { Address, readContract, readContracts } from '@wagmi/core'
 import { BigNumber } from 'ethers'
 
 import { MINICHEF_ADDRESS } from '../../../config'
 
 export async function getPoolLength(chainId: ChainId) {
-  const poolLengthCall: ReadContractConfig = {
+  const poolLengthCall = {
     address: MINICHEF_ADDRESS[chainId],
     chainId: chainId,
-    abi: MiniChefV2ABI,
+    abi: miniChefAbi,
     functionName: 'poolLength',
-  }
+  } as const
+
   return readContract(poolLengthCall)
 }
 
 export async function getTotalAllocPoint(chainId: ChainId) {
-  const totalAllocPointCall: ReadContractConfig = {
+  const totalAllocPointCall = {
     address: MINICHEF_ADDRESS[chainId],
     chainId: chainId,
-    abi: MiniChefV2ABI,
+    abi: miniChefAbi,
     functionName: 'totalAllocPoint',
-  }
+  } as const
 
   return readContract(totalAllocPointCall)
 }
@@ -34,49 +32,62 @@ export async function getSushiPerSecond(chainId: ChainId) {
   const sushiPerSecondCall = {
     address: MINICHEF_ADDRESS[chainId],
     chainId: chainId,
-    abi: MiniChefV2ABI,
+    abi: miniChefAbi,
     functionName: 'sushiPerSecond',
-  }
+  } as const
+
   return readContract(sushiPerSecondCall)
 }
 
 export async function getPoolInfos(poolLength: number, chainId: ChainId) {
-  const poolInfoCalls: ReadContractsConfig['contracts'] = [...Array(poolLength)].map((_, i) => ({
-    address: MINICHEF_ADDRESS[chainId],
-    args: [i],
-    chainId: chainId,
-    abi: MiniChefV2ABI,
-    functionName: 'poolInfo',
-  }))
-  return readContracts<Awaited<ReturnType<MiniChefV2['poolInfo']>>[]>({
+  const poolInfoCalls = [...Array(poolLength)].map(
+    (_, i) =>
+      ({
+        address: MINICHEF_ADDRESS[chainId],
+        args: [BigNumber.from(i)],
+        chainId: chainId,
+        abi: miniChefAbi,
+        functionName: 'poolInfo',
+      } as const)
+  )
+
+  return readContracts({
     allowFailure: true,
     contracts: poolInfoCalls,
   })
 }
 
 export async function getLpTokens(poolLength: number, chainId: ChainId) {
-  const lpTokenCalls: ReadContractsConfig['contracts'] = [...Array(poolLength)].map((_, i) => ({
-    address: MINICHEF_ADDRESS[chainId],
-    args: [i],
-    chainId: chainId,
-    abi: MiniChefV2ABI,
-    functionName: 'lpToken',
-  }))
-  return readContracts<Awaited<ReturnType<MiniChefV2['lpToken']>>[]>({
+  const lpTokenCalls = [...Array(poolLength)].map(
+    (_, i) =>
+      ({
+        address: MINICHEF_ADDRESS[chainId],
+        args: [BigNumber.from(i)],
+        chainId: chainId,
+        abi: miniChefAbi,
+        functionName: 'lpToken',
+      } as const)
+  )
+
+  return readContracts({
     allowFailure: true,
     contracts: lpTokenCalls,
   })
 }
 
 export async function getRewarders(poolLength: number, chainId: ChainId) {
-  const rewarderCalls: ReadContractsConfig['contracts'] = [...Array(poolLength)].map((_, i) => ({
-    address: MINICHEF_ADDRESS[chainId],
-    args: [i],
-    chainId: chainId,
-    abi: MiniChefV2ABI,
-    functionName: 'rewarder',
-  }))
-  return readContracts<Awaited<ReturnType<MiniChefV2['rewarder']>>[]>({
+  const rewarderCalls = [...Array(poolLength)].map(
+    (_, i) =>
+      ({
+        address: MINICHEF_ADDRESS[chainId],
+        args: [BigNumber.from(i)],
+        chainId: chainId,
+        abi: miniChefAbi,
+        functionName: 'rewarder',
+      } as const)
+  )
+
+  return readContracts({
     allowFailure: true,
     contracts: rewarderCalls,
   })
@@ -84,7 +95,7 @@ export async function getRewarders(poolLength: number, chainId: ChainId) {
 
 export async function getRewarderInfos(chainId: ChainId) {
   const { getBuiltGraphSDK } = await import('../../../../.graphclient')
-  const subgraphName = MINICHEF_SUBGRAPH_NAME[chainId]
+  const subgraphName = (MINICHEF_SUBGRAPH_NAME as Record<ChainId, string>)[chainId] as string
   console.log(chainId, subgraphName)
   const sdk = getBuiltGraphSDK({ host: SUBGRAPH_HOST[chainId], name: subgraphName })
 
@@ -129,15 +140,18 @@ export async function getRewarderInfos(chainId: ChainId) {
 
         const poolIds = !poolLength?.isZero() ? [...Array(poolLength?.toNumber()).keys()] : []
 
-        const poolInfoCalls: ReadContractsConfig['contracts'] = poolIds.map((_, i) => ({
-          address: rewarder.id,
-          args: [i],
-          chainId: chainId,
-          abi: ComplexRewarderTimeABI,
-          functionName: 'poolInfo',
-        }))
+        const poolInfoCalls = poolIds.map(
+          (_, i) =>
+            ({
+              address: rewarder.id as Address,
+              args: [BigNumber.from(i)],
+              chainId: chainId,
+              abi: complexRewarderTimeAbi,
+              functionName: 'poolInfo',
+            } as const)
+        )
 
-        const poolInfos = await readContracts<Awaited<ReturnType<ComplexRewarderTime['poolInfo']>>[]>({
+        const poolInfos = await readContracts({
           allowFailure: true,
           contracts: poolInfoCalls,
         })
@@ -147,7 +161,7 @@ export async function getRewarderInfos(chainId: ChainId) {
           pools: poolIds.map((_, i) => ({
             // Minichef pool ID
             id: poolIds[i],
-            allocPoint: Number(poolInfos[i].allocPoint),
+            allocPoint: poolInfos[i].allocPoint.toNumber(),
           })),
           totalAllocPoint: poolInfos.reduce((acc, cur) => (acc += cur.allocPoint.toNumber()), 0),
           rewardToken: rewarder.rewardToken,

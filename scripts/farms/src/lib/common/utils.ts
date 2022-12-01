@@ -1,6 +1,6 @@
-import { BigNumber, utils } from 'ethers'
+import { BigNumberish, utils } from 'ethers'
 
-export const divBigNumberToNumber = (value: BigNumber, decimals: number): number =>
+export const divBigNumberToNumber = (value: BigNumberish, decimals: BigNumberish): number =>
   Number(utils.formatUnits(value, decimals))
 
 /**
