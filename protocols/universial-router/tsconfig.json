@@ -1,0 +1,15 @@
+{
+  "extends": "@sushiswap/typescript-config/hardhat.json",
+  "include": ["scripts", "test", "deploy"],
+  "exclude": ["soljson-v0.6.12+commit.27d51765.js"],
+  "compilerOptions": {
+    "lib": ["ESNext"],
+    "module": "NodeNext",
+    "moduleResolution": "node16",
+    "esModuleInterop": true,
+  },
+  "ts-node": {
+    "esm": true
+  },
+  "files": ["hardhat.config.cts"],
+}

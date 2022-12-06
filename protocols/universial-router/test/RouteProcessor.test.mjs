@@ -1,21 +1,21 @@
-import { ethers, network } from 'hardhat'
-import { RouteProcessor__factory } from '../types/index'
-import { Swapper } from '../scripts/Swapper'
+import hardhat from 'hardhat'
+import { Swapper } from '@sushiswap/route-processor/dist/Swapper.mjs'
 import { getBigNumber, RouteStatus } from '@sushiswap/tines'
-import { WETH9ABI } from '../ABI/WETH9'
-import { HardhatNetworkConfig, ProviderConnectInfo } from 'hardhat/types'
-import { HEXer } from '../scripts/HEXer'
-import { ERC20ABI } from '../ABI/ERC20'
-import { BentoBox } from '../scripts/liquidityProviders/Trident'
+import { WETH9ABI } from '../ABI/WETH9.mjs'
+import { HEXer } from '@sushiswap/route-processor/dist/HEXer.mjs'
+import { ERC20ABI } from '../ABI/ERC20.mjs'
+import { BentoBox } from '@sushiswap/route-processor/dist/liquidityProviders/Trident.mjs'
 import { Contract } from 'ethers'
-import { BentoBoxABI } from '../ABI/BentoBoxABI'
+import { BentoBoxABI } from '../ABI/BentoBoxABI.mjs'
 import { ChainKey, ChainId } from '@sushiswap/chain'
 import { SUSHI, Token, WBTC, WNATIVE } from '@sushiswap/currency'
 import { expect } from 'chai'
 
-const delay = async (ms: number) => new Promise((res) => setTimeout(res, ms))
+const { ethers, network } = hardhat
 
-const WRAPPED_NATIVE: Record<number, Token> = {
+const delay = async (ms) => new Promise((res) => setTimeout(res, ms))
+
+const WRAPPED_NATIVE = {
   [ChainId.ETHEREUM]: new Token({
     chainId: ChainId.ETHEREUM,
     address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
@@ -32,7 +32,7 @@ const WRAPPED_NATIVE: Record<number, Token> = {
   }),
 }
 
-async function BentoMakeTokenStrategyPercentage(chainId: ChainId, token: string, percentage: number) {
+async function BentoMakeTokenStrategyPercentage(chainId, token, percentage) {
   await network.provider.request({
     method: 'hardhat_impersonateAccount',
     params: ['0x850a57630a2012b2494779fbc86bbc24f2a7baef'],
@@ -51,7 +51,7 @@ async function BentoMakeTokenStrategyPercentage(chainId: ChainId, token: string,
 }
 
 // Swaps amountIn basewrappedToken(WETH, ...) to toToken
-async function testRouteProcessor(chainId: ChainId, amountIn: number, toToken: Token, swaps = 1) {
+async function testRouteProcessor(chainId, amountIn, toToken, swaps = 1) {
   console.log(`1. ${chainId} RouteProcessor deployment ...`)
   // const [_, John] = await ethers.getSigners()
   // const provider = John.provider as Provider
@@ -68,7 +68,7 @@ async function testRouteProcessor(chainId: ChainId, amountIn: number, toToken: T
       throw new Error('Unsupported net!')
   }
 
-  const RouteProcessor: RouteProcessor__factory = await ethers.getContractFactory('RouteProcessor')
+  const RouteProcessor = await ethers.getContractFactory('RouteProcessor')
   const routeProcessor = await RouteProcessor.deploy(BentoBox[chainId] || '0x0000000000000000000000000000000000000000')
   await routeProcessor.deployed()
 
@@ -148,10 +148,10 @@ async function testRouteProcessor(chainId: ChainId, amountIn: number, toToken: T
 
 describe('RouteProcessor', async function () {
   it.skip('Contract call check', async function () {
-    const forking_url = (network.config as HardhatNetworkConfig)?.forking?.url
+    const forking_url = network.config?.forking?.url
     if (forking_url !== undefined && forking_url.search('polygon') >= 0) {
       const erc20 = new ethers.utils.Interface(ERC20ABI)
-      const callDataHex: string = erc20.encodeFunctionData('symbol', [])
+      const callDataHex = erc20.encodeFunctionData('symbol', [])
 
       const WMATIC = WRAPPED_NATIVE[ChainId.POLYGON]
       const code = new HEXer()
@@ -161,7 +161,7 @@ describe('RouteProcessor', async function () {
         .hexData(callDataHex)
         .toString0x()
 
-      const RouteProcessor: RouteProcessor__factory = await ethers.getContractFactory('RouteProcessor')
+      const RouteProcessor = await ethers.getContractFactory('RouteProcessor')
       const routeProcessor = await RouteProcessor.deploy(BentoBox[ChainId.POLYGON])
       await routeProcessor.deployed()
 
@@ -172,7 +172,7 @@ describe('RouteProcessor', async function () {
   })
 
   it('Ethereum WETH => FEI check', async function () {
-    const forking_url = (network.config as HardhatNetworkConfig)?.forking?.url
+    const forking_url = network.config?.forking?.url
     if (forking_url !== undefined && forking_url.search('eth-mainnet') >= 0) {
       expect(process.env.ALCHEMY_API_KEY).not.undefined
       const FEI = new Token({
@@ -187,7 +187,7 @@ describe('RouteProcessor', async function () {
   })
 
   it.skip('Polygon WMATIC => SUSHI check', async function () {
-    const forking_url = (network.config as HardhatNetworkConfig)?.forking?.url
+    const forking_url = network.config?.forking?.url
     if (forking_url !== undefined && forking_url.search('polygon') >= 0) {
       expect(process.env.ALCHEMY_POLYGON_API_KEY).not.undefined
       await testRouteProcessor(ChainId.POLYGON, 1_000_000, SUSHI[ChainId.POLYGON])
@@ -195,14 +195,14 @@ describe('RouteProcessor', async function () {
   })
 
   it.skip('Polygon 5 swaps test', async function () {
-    const forking_url = (network.config as HardhatNetworkConfig)?.forking?.url
+    const forking_url = network.config?.forking?.url
     if (forking_url !== undefined && forking_url.search('polygon') >= 0) {
       await testRouteProcessor(ChainId.POLYGON, 1000000, SUSHI[ChainId.POLYGON], 5)
     }
   })
 
   it.skip('Polygon max output limitation', async function () {
-    const forking_url = (network.config as HardhatNetworkConfig)?.forking?.url
+    const forking_url = network.config?.forking?.url
     if (forking_url !== undefined && forking_url.search('polygon') >= 0) {
       const WBTC_Token = WBTC[ChainId.POLYGON]
       await BentoMakeTokenStrategyPercentage(ChainId.POLYGON, WBTC_Token.address, 60)

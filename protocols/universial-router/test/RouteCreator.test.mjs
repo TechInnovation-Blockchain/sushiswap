@@ -1,22 +1,17 @@
-import { ethers, network } from 'hardhat'
-import { RouteProcessor__factory } from '../typechain'
-import { Swapper } from '../scripts/Swapper'
-import { getBigNumber, MultiRoute, RouteStatus } from '@sushiswap/tines'
-import { WETH9ABI } from '../ABI/WETH9'
-import { HardhatNetworkConfig, ProviderConnectInfo } from 'hardhat/types'
-import { HEXer } from '../scripts/HEXer'
-import { ERC20ABI } from '../ABI/ERC20'
-import { BentoBox } from '../scripts/liquidityProviders/Trident'
-import { Contract } from 'ethers'
-import { BentoBoxABI } from '../ABI/BentoBoxABI'
-import { ChainKey, ChainId } from '@sushiswap/chain'
-import { SUSHI, Token, WBTC, WNATIVE } from '@sushiswap/currency'
+import hardhat from 'hardhat'
+import { getBigNumber } from '@sushiswap/tines'
+import { WETH9ABI } from '../ABI/WETH9.mjs'
+import { BentoBox } from '@sushiswap/route-processor/dist/liquidityProviders/Trident.mjs'
+import { ChainId } from '@sushiswap/chain'
+import { SUSHI, Token, WNATIVE } from '@sushiswap/currency'
 import { expect } from 'chai'
-import { RouteCreator } from '../scripts/RouteCreator'
+import { RouteCreator } from '@sushiswap/route-processor/dist/RouteCreator.mjs'
 
-const delay = async (ms: number) => new Promise((res) => setTimeout(res, ms))
+const { ethers, network } = hardhat
 
-const WRAPPED_NATIVE: Record<number, Token> = {
+const delay = async (ms) => new Promise((res) => setTimeout(res, ms))
+
+const WRAPPED_NATIVE = {
   [ChainId.ETHEREUM]: new Token({
     chainId: ChainId.ETHEREUM,
     address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
@@ -34,10 +29,10 @@ const WRAPPED_NATIVE: Record<number, Token> = {
 }
 
 class BackCounter {
-  start: number
-  current: number
+  start
+  current
 
-  constructor(start: number) {
+  constructor(start) {
     this.start = start
     this.current = start
   }
@@ -55,7 +50,7 @@ class BackCounter {
   }
 }
 
-async function testRouteCreator(chainId: ChainId, amountIn: number, toToken: Token, swaps = 1) {
+async function testRouteCreator(chainId, amountIn, toToken, swaps = 1) {
   let provider
   switch (chainId) {
     case ChainId.ETHEREUM:
@@ -87,7 +82,7 @@ async function testRouteCreator(chainId: ChainId, amountIn: number, toToken: Tok
 
   console.log(`2. ChainId=${chainId} RouteProcessor deployment ...`)
 
-  const RouteProcessor: RouteProcessor__factory = await ethers.getContractFactory('RouteProcessor')
+  const RouteProcessor = await ethers.getContractFactory('RouteProcessor')
   const routeProcessor = await RouteProcessor.deploy(BentoBox[chainId] || '0x0000000000000000000000000000000000000000')
   await routeProcessor.deployed()
 
@@ -108,7 +103,7 @@ async function testRouteCreator(chainId: ChainId, amountIn: number, toToken: Tok
   const code = routeCreator.getRouteProcessorCodeForBestRoute(routeProcessor.address, Alice.address, 0.5)
 
   console.log('7. Call route processor ...')
-  const route = routeCreator.getBestRoute() as MultiRoute
+  const route = routeCreator.getBestRoute()
   const amountOutMin = route.amountOutBN.mul(getBigNumber((1 - 0.005) * 1_000_000)).div(1_000_000)
 
   const toTokenContract = await new ethers.Contract(toToken.address, WETH9ABI, Alice)
@@ -134,7 +129,7 @@ async function testRouteCreator(chainId: ChainId, amountIn: number, toToken: Tok
 
 describe('RouteCreator', async function () {
   it('Ethereum WETH => FEI check', async function () {
-    const forking_url = (network.config as HardhatNetworkConfig)?.forking?.url
+    const forking_url = network.config?.forking?.url
     if (forking_url !== undefined && forking_url.search('eth-mainnet') >= 0) {
       expect(process.env.ALCHEMY_API_KEY).not.undefined
       const FEI = new Token({
@@ -149,7 +144,7 @@ describe('RouteCreator', async function () {
   })
 
   it('Polygon WMATIC => SUSHI check', async function () {
-    const forking_url = (network.config as HardhatNetworkConfig)?.forking?.url
+    const forking_url = network.config?.forking?.url
     if (forking_url !== undefined && forking_url.search('polygon') >= 0) {
       expect(process.env.ALCHEMY_POLYGON_API_KEY).not.undefined
       await testRouteCreator(ChainId.POLYGON, 1_000_000, SUSHI[ChainId.POLYGON])

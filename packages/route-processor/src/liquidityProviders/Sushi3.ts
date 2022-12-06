@@ -1,46 +1,46 @@
-import { ConstantProductRPool, RToken } from '@sushiswap/tines'
-import { BigNumber, ethers } from 'ethers'
-import { LiquidityProvider } from './LiquidityProvider'
-import { getCreate2Address } from 'ethers/lib/utils'
 import { keccak256, pack } from '@ethersproject/solidity'
-import { SushiPoolABI } from '../../ABI/SushiPool'
-import { Limited } from '../Limited'
-import { PoolCode } from '../pools/PoolCode'
-import { ConstantProductPoolCode } from '../pools/ConstantProductPool'
+import { FACTORY_ADDRESS, INIT_CODE_HASH } from '@sushiswap/amm'
 import { ChainId } from '@sushiswap/chain'
 import { ADDITIONAL_BASES, BASES_TO_CHECK_TRADES_AGAINST, Token } from '@sushiswap/currency'
-import { FACTORY_ADDRESS, INIT_CODE_HASH } from '@sushiswap/amm'
-import { LiquidityProvider2, LiquidityProviders } from './LiquidityProvider2'
 // import {
 //   Multicall,
 //   ContractCallResults,
 //   ContractCallContext,
 // } from 'ethereum-multicall';
-//import { multicall } from '@wagmi/core'
+import { multicall } from '@wagmi/core'
+import ethers from 'ethers'
 
-const getReservesABI = [{
-  inputs: [],
-  name: 'getReserves',
-  outputs: [
-    {
-      internalType: 'uint112',
-      name: '_reserve0',
-      type: 'uint112',
-    },
-    {
-      internalType: 'uint112',
-      name: '_reserve1',
-      type: 'uint112',
-    },
-    {
-      internalType: 'uint32',
-      name: '_blockTimestampLast',
-      type: 'uint32',
-    },
-  ],
-  stateMutability: 'view',
-  type: 'function',
-}]
+const { getCreate2Address } = ethers.utils
+
+import { Limited } from '../Limited'
+import { PoolCode } from '../pools/PoolCode'
+import { LiquidityProvider2, LiquidityProviders } from './LiquidityProvider2'
+
+const getReservesABI = [
+  {
+    inputs: [],
+    name: 'getReserves',
+    outputs: [
+      {
+        internalType: 'uint112',
+        name: '_reserve0',
+        type: 'uint112',
+      },
+      {
+        internalType: 'uint112',
+        name: '_reserve1',
+        type: 'uint112',
+      },
+      {
+        internalType: 'uint32',
+        name: '_blockTimestampLast',
+        type: 'uint32',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+] as const
 
 const callsGetReserves = [{ reference: '', methodName: 'getReserves', methodParameters: [] }]
 
@@ -59,7 +59,9 @@ export class SushiProvider3 extends LiquidityProvider2 {
     return LiquidityProviders.Sushiswap
   }
 
-  getPoolProviderName(): string {return 'Sushiswap'}
+  getPoolProviderName(): string {
+    return 'Sushiswap'
+  }
 
   async getPools(tokens: Token[]): Promise<void> {
     if (FACTORY_ADDRESS[this.chainId] === undefined) {
@@ -68,13 +70,15 @@ export class SushiProvider3 extends LiquidityProvider2 {
     }
 
     // tokens deduplication
-    const tokenMap = new Map<string, Token>
-    tokens.forEach(t => tokenMap.set(t.address.toLocaleLowerCase().substring(2).padStart(40, '0'), t))
+    const tokenMap = new Map<string, Token>()
+    tokens.forEach((t) => tokenMap.set(t.address.toLocaleLowerCase().substring(2).padStart(40, '0'), t))
     const tokensDedup = Array.from(tokenMap.values())
     // tokens sorting
-    const tok0:[string, Token][] = 
-      tokensDedup.map(t => [t.address.toLocaleLowerCase().substring(2).padStart(40, '0'), t])
-    tokens = tok0.sort((a, b) => b[0] > a[0] ? -1 : 1).map(([_, t]) => t)
+    const tok0: [string, Token][] = tokensDedup.map((t) => [
+      t.address.toLocaleLowerCase().substring(2).padStart(40, '0'),
+      t,
+    ])
+    tokens = tok0.sort((a, b) => (b[0] > a[0] ? -1 : 1)).map(([_, t]) => t)
 
     const poolAddr: Map<string, [Token, Token]> = new Map()
     for (let i = 0; i < tokens.length; ++i) {
@@ -89,18 +93,19 @@ export class SushiProvider3 extends LiquidityProvider2 {
         }
       }
     }
-    
-    const reservesCalls = Array.from(poolAddr.keys()).map(p => ({
+
+    const reservesCalls = Array.from(poolAddr.keys()).map((p) => ({
       contractAddress: p,
       abi: getReservesABI,
-      functionName: 'getReserves'
+      functionName: 'getReserves',
     }))
+
     const data = await multicall({
       // @ts-ignore
       contracts: reservesCalls,
     })
-    console.log(data);
-    
+    console.log(data)
+
     //const results: ContractCallResults = await multicall(getReservesCalls);
     /*const res = results.results
     for (let r in res) {
@@ -159,15 +164,15 @@ export class SushiProvider3 extends LiquidityProvider2 {
     )
   }
 
-  _getProspectiveTokens(t0: Token, t1:Token) {
+  _getProspectiveTokens(t0: Token, t1: Token) {
     const set = new Set<Token>([
       t0,
       t1,
-      ...BASES_TO_CHECK_TRADES_AGAINST[this.chainId], 
+      ...BASES_TO_CHECK_TRADES_AGAINST[this.chainId],
       ...(ADDITIONAL_BASES[this.chainId][t0.address] || []),
       ...(ADDITIONAL_BASES[this.chainId][t1.address] || []),
-     ])
-     return Array.from(set)
+    ])
+    return Array.from(set)
   }
 
   startFetchPoolsData() {
@@ -187,8 +192,7 @@ export class SushiProvider3 extends LiquidityProvider2 {
     return this.poolCodes
   }
   stopFetchPoolsData() {
-    if (this.blockListener)
-      this.chainDataProvider.off('block', this.blockListener)
+    if (this.blockListener) this.chainDataProvider.off('block', this.blockListener)
     this.blockListener = undefined
   }
 }

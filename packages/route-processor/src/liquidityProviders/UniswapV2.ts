@@ -1,17 +1,27 @@
-import { ConstantProductRPool, RToken } from '@sushiswap/tines'
-import { BigNumber, ethers } from 'ethers'
-import { LiquidityProvider } from './LiquidityProvider'
-import { getCreate2Address } from 'ethers/lib/utils'
 import { keccak256, pack } from '@ethersproject/solidity'
-import { SushiPoolABI } from '../../ABI/SushiPool'
-import { Limited } from '../Limited'
-import { PoolCode } from '../pools/PoolCode'
-import { ConstantProductPoolCode } from '../pools/ConstantProductPool'
 import { ChainId } from '@sushiswap/chain'
 import { ADDITIONAL_BASES, BASES_TO_CHECK_TRADES_AGAINST, Token } from '@sushiswap/currency'
-import { FACTORY_ADDRESS, INIT_CODE_HASH } from '@sushiswap/amm'
+import { ConstantProductRPool, RToken } from '@sushiswap/tines'
+import { BigNumber, ethers } from 'ethers'
 
-export class SushiProvider extends LiquidityProvider {
+
+import { SushiPoolABI } from '../ABI/SushiPool'
+import { Limited } from '../Limited'
+import { ConstantProductPoolCode } from '../pools/ConstantProductPool'
+import { PoolCode } from '../pools/PoolCode'
+import { LiquidityProvider } from './LiquidityProvider'
+
+const { getCreate2Address } = ethers.utils
+
+const UNISWAP_V2_FACTORY: Record<string | number, string> = {
+  [ChainId.ETHEREUM]: '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f',
+}
+
+const UNISWAP_INIT_CODE_HASH: Record<string | number, string> = {
+  [ChainId.ETHEREUM]: '0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f',
+}
+
+export class UniswapProvider extends LiquidityProvider {
   poolCodes: PoolCode[]
   lastPoolCodeNumber: number
 
@@ -22,12 +32,12 @@ export class SushiProvider extends LiquidityProvider {
   }
 
   getPoolProviderName(): string {
-    return 'Sushiswap'
+    return 'UniswapV2'
   }
 
   async getPools(t0: Token, t1: Token): Promise<PoolCode[]> {
-    if (FACTORY_ADDRESS[this.chainId] === undefined) {
-      // No sushiswap for this network
+    if (UNISWAP_V2_FACTORY[this.chainId] === undefined) {
+      // No uniswap for this network
       return []
     }
     const tokens = this._getAllRouteTokens(t0, t1)
@@ -35,12 +45,23 @@ export class SushiProvider extends LiquidityProvider {
     return pools
   }
 
+  _getAllRouteTokens(t1: Token, t2: Token) {
+    const set = new Set<Token>([
+      t1,
+      t2,
+      ...BASES_TO_CHECK_TRADES_AGAINST[this.chainId],
+      ...(ADDITIONAL_BASES[this.chainId][t1.address] || []),
+      ...(ADDITIONAL_BASES[this.chainId][t2.address] || []),
+    ])
+    return Array.from(set)
+  }
+
   _getPoolAddress(t1: Token, t2: Token): string {
     const [token0, token1] = t1.address.toLowerCase() < t2.address.toLowerCase() ? [t1, t2] : [t2, t1]
     return getCreate2Address(
-      FACTORY_ADDRESS[this.chainId],
+      UNISWAP_V2_FACTORY[this.chainId],
       keccak256(['bytes'], [pack(['address', 'address'], [token0.address, token1.address])]),
-      INIT_CODE_HASH[this.chainId]
+      UNISWAP_INIT_CODE_HASH[this.chainId]
     )
   }
 
@@ -68,17 +89,6 @@ export class SushiProvider extends LiquidityProvider {
     }
     const pools = await Promise.all(poolData)
     return pools.filter((p) => p !== undefined) as PoolCode[]
-  }
-
-  _getAllRouteTokens(t1: Token, t2: Token) {
-    const set = new Set<Token>([
-      t1,
-      t2,
-      ...BASES_TO_CHECK_TRADES_AGAINST[this.chainId],
-      ...(ADDITIONAL_BASES[this.chainId][t1.address] || []),
-      ...(ADDITIONAL_BASES[this.chainId][t2.address] || []),
-    ])
-    return Array.from(set)
   }
 
   startGetherData(t0: Token, t1: Token) {

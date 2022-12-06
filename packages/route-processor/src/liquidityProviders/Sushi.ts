@@ -1,19 +1,19 @@
-import { ConstantProductRPool, RToken } from '@sushiswap/tines'
-import { BigNumber, ethers } from 'ethers'
-import { LiquidityProvider } from './LiquidityProvider'
-import { getCreate2Address } from 'ethers/lib/utils'
 import { keccak256, pack } from '@ethersproject/solidity'
-import { SushiPoolABI } from '../../ABI/SushiPool'
-import { Limited } from '../Limited'
-import { PoolCode } from '../pools/PoolCode'
-import { ConstantProductPoolCode } from '../pools/ConstantProductPool'
+import { FACTORY_ADDRESS, INIT_CODE_HASH } from '@sushiswap/amm'
 import { ChainId } from '@sushiswap/chain'
 import { ADDITIONAL_BASES, BASES_TO_CHECK_TRADES_AGAINST, Token } from '@sushiswap/currency'
-import { FACTORY_ADDRESS, INIT_CODE_HASH } from '@sushiswap/amm'
-import { LiquidityProvider2, LiquidityProviders } from './LiquidityProvider2'
+import { ConstantProductRPool, RToken } from '@sushiswap/tines'
+import { BigNumber, ethers } from 'ethers'
 
-export class SushiProvider2 extends LiquidityProvider2 {
-  fetchedPools: Set<string>
+import { SushiPoolABI } from '../ABI/SushiPool'
+import { Limited } from '../Limited'
+import { ConstantProductPoolCode } from '../pools/ConstantProductPool'
+import { PoolCode } from '../pools/PoolCode'
+import { LiquidityProvider } from './LiquidityProvider'
+
+const { getCreate2Address } = ethers.utils
+
+export class SushiProvider extends LiquidityProvider {
   poolCodes: PoolCode[]
   lastPoolCodeNumber: number
 
@@ -21,20 +21,18 @@ export class SushiProvider2 extends LiquidityProvider2 {
     super(chainDataProvider, chainId, l)
     this.poolCodes = []
     this.lastPoolCodeNumber = 0
-    this.fetchedPools = new Set()
   }
 
-  getType(): LiquidityProviders {
-    return LiquidityProviders.Sushiswap
+  getPoolProviderName(): string {
+    return 'Sushiswap'
   }
 
-  getPoolProviderName(): string {return 'Sushiswap'}
-
-  async getPools(tokens: Token[]): Promise<PoolCode[]> {
+  async getPools(t0: Token, t1: Token): Promise<PoolCode[]> {
     if (FACTORY_ADDRESS[this.chainId] === undefined) {
       // No sushiswap for this network
       return []
     }
+    const tokens = this._getAllRouteTokens(t0, t1)
     const pools = await this._getAllPools(tokens)
     return pools
   }
@@ -51,8 +49,6 @@ export class SushiProvider2 extends LiquidityProvider2 {
   async _getPoolData(t0: Token, t1: Token): Promise<PoolCode | undefined> {
     const [token0, token1] = t0.address.toLowerCase() < t1.address.toLowerCase() ? [t0, t1] : [t1, t0]
     const poolAddress = this._getPoolAddress(token0, token1)
-    if (this.fetchedPools.has(poolAddress)) return // not to fetch it again
-    this.fetchedPools.add(poolAddress)
     try {
       const pool = await new ethers.Contract(poolAddress, SushiPoolABI, this.chainDataProvider)
       const [reserve0, reserve1]: [BigNumber, BigNumber] = await this.limited.callOnce(() => pool.getReserves())
@@ -76,25 +72,21 @@ export class SushiProvider2 extends LiquidityProvider2 {
     return pools.filter((p) => p !== undefined) as PoolCode[]
   }
 
-  _getProspectiveTokens(t0: Token, t1:Token) {
+  _getAllRouteTokens(t1: Token, t2: Token) {
     const set = new Set<Token>([
-      t0,
       t1,
-      ...BASES_TO_CHECK_TRADES_AGAINST[this.chainId], 
-      ...(ADDITIONAL_BASES[this.chainId][t0.address] || []),
+      t2,
+      ...BASES_TO_CHECK_TRADES_AGAINST[this.chainId],
       ...(ADDITIONAL_BASES[this.chainId][t1.address] || []),
-     ])
-     return Array.from(set)
+      ...(ADDITIONAL_BASES[this.chainId][t2.address] || []),
+    ])
+    return Array.from(set)
   }
 
-  startFetchPoolsData() {
+  startGetherData(t0: Token, t1: Token) {
     this.poolCodes = []
     this.lastPoolCodeNumber = 0
-    this.fetchedPools.clear()
-    this.getPools(BASES_TO_CHECK_TRADES_AGAINST[this.chainId]) // starting the process
-  }
-  fetchPoolsForToken(t0: Token, t1: Token): void {
-    this.getPools(this._getProspectiveTokens(t0, t1))
+    this.getPools(t0, t1) // starting the process
   }
   poolListWereUpdated(): boolean {
     return this.lastPoolCodeNumber !== this.poolCodes.length
@@ -103,5 +95,5 @@ export class SushiProvider2 extends LiquidityProvider2 {
     this.lastPoolCodeNumber = this.poolCodes.length
     return this.poolCodes
   }
-  stopFetchPoolsData() {}
+  stopGetherData() {}
 }
