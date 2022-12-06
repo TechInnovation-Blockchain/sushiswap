@@ -11,11 +11,12 @@ import { ChainId } from '@sushiswap/chain'
 import { ADDITIONAL_BASES, BASES_TO_CHECK_TRADES_AGAINST, Token } from '@sushiswap/currency'
 import { FACTORY_ADDRESS, INIT_CODE_HASH } from '@sushiswap/amm'
 import { LiquidityProvider2, LiquidityProviders } from './LiquidityProvider2'
-import {
-  Multicall,
-  ContractCallResults,
-  ContractCallContext,
-} from 'ethereum-multicall';
+// import {
+//   Multicall,
+//   ContractCallResults,
+//   ContractCallContext,
+// } from 'ethereum-multicall';
+//import { multicall } from '@wagmi/core'
 
 const getReservesABI = [{
   inputs: [],
@@ -46,12 +47,12 @@ const callsGetReserves = [{ reference: '', methodName: 'getReserves', methodPara
 export class SushiProvider3 extends LiquidityProvider2 {
   fetchedPools: Map<string, number> = new Map()
   poolCodes: PoolCode[] = []
-  multicall: Multicall
+  //multicall: Multicall
   blockListener: any
 
   constructor(chainDataProvider: ethers.providers.BaseProvider, chainId: ChainId, l: Limited) {
     super(chainDataProvider, chainId, l)
-    this.multicall = new Multicall({ ethersProvider: chainDataProvider, tryAggregate: true });
+    //this.multicall = new Multicall({ ethersProvider: chainDataProvider, tryAggregate: true });
   }
 
   getType(): LiquidityProviders {
@@ -89,14 +90,19 @@ export class SushiProvider3 extends LiquidityProvider2 {
       }
     }
     
-    const getReservesCalls: ContractCallContext[] = Array.from(poolAddr.keys()).map(p => ({
-      reference: p,
+    const reservesCalls = Array.from(poolAddr.keys()).map(p => ({
       contractAddress: p,
       abi: getReservesABI,
-      calls: callsGetReserves
+      functionName: 'getReserves'
     }))
-    const results: ContractCallResults = await this.multicall.call(getReservesCalls);
-    const res = results.results
+    const data = await multicall({
+      // @ts-ignore
+      contracts: reservesCalls,
+    })
+    console.log(data);
+    
+    //const results: ContractCallResults = await multicall(getReservesCalls);
+    /*const res = results.results
     for (let r in res) {
       const addr = res[r].originalContractCallContext.reference
       const ret = res[r].callsReturnContext[0]
@@ -112,12 +118,12 @@ export class SushiProvider3 extends LiquidityProvider2 {
         this.poolCodes.push(pc)   
         ++this.stateId
       }
-    }
+    }*/
   }
 
   // TODO: remove too often updates if the network generates too many blocks
   async updatePoolsData() {
-    const poolCodes = new Map<string, PoolCode>()
+    /*const poolCodes = new Map<string, PoolCode>()
     this.poolCodes.forEach(p => poolCodes.set(p.pool.address, p))
     const poolAddr = this.poolCodes.map(p => p.pool.address)
     const getReservesCalls: ContractCallContext[] = this.poolCodes.map(p => ({
@@ -142,7 +148,7 @@ export class SushiProvider3 extends LiquidityProvider2 {
           }
         } 
       }
-    }
+    }*/
   }
 
   _getPoolAddress(t1: Token, t2: Token): string {

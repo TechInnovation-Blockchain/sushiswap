@@ -2575,6 +2575,7 @@ importers:
       '@types/node': ^17.0.0
       '@typescript-eslint/eslint-plugin': ^5.8.0
       '@typescript-eslint/parser': ^5.8.0
+      '@wagmi/core': ^0.7.9
       chai: ^4.3.0
       cross-env: ^7.0.0
       dotenv: ^10.0.0
@@ -2600,6 +2601,7 @@ importers:
       typechain: ^6.1.0
       typescript: ^4.5.0
     dependencies:
+      '@wagmi/core': 0.7.9_22kkg7buoyhb2fr7nhycu7d7gq
       ethereum-multicall: 2.15.0
     devDependencies:
       '@commitlint/cli': 16.3.0
@@ -12737,6 +12739,28 @@ packages:
       - typescript
     dev: true
 
+  /@wagmi/core/0.7.9_22kkg7buoyhb2fr7nhycu7d7gq:
+    resolution: {integrity: sha512-97KCELUP5Q1AagRyE7SmpLh4/v3xdcy/XMbybLvvtQbgmi3y5oEzy4h/wJMY1hEZlmicqyWZAHHm6xIr1tP5HA==}
+    peerDependencies:
+      '@coinbase/wallet-sdk': '>=3.3.0'
+      '@walletconnect/ethereum-provider': '>=1.7.5'
+      ethers: '>=5.5.1'
+    peerDependenciesMeta:
+      '@coinbase/wallet-sdk':
+        optional: true
+      '@walletconnect/ethereum-provider':
+        optional: true
+    dependencies:
+      abitype: 0.1.8_typescript@4.8.4
+      ethers: 5.7.1
+      eventemitter3: 4.0.7
+      zustand: 4.1.4
+    transitivePeerDependencies:
+      - immer
+      - react
+      - typescript
+    dev: false
+
   /@walletconnect/browser-utils/1.8.0:
     resolution: {integrity: sha512-Wcqqx+wjxIo9fv6eBUFHPsW1y/bGWWRboni5dfD8PtOmrihrEpOCmvRJe4rfl7xgJW8Ea9UqKEaq0bIRLHlK4A==}
     dependencies:
@@ -13108,6 +13132,15 @@ packages:
       typescript: '>=4.7.4'
     dependencies:
       typescript: 4.8.2
+
+  /abitype/0.1.8_typescript@4.8.4:
+    resolution: {integrity: sha512-2pde0KepTzdfu19ZrzYTYVIWo69+6UbBCY4B1RDiwWgo2XZtFSJhF6C+XThuRXbbZ823J0Rw1Y5cP0NXYVcCdQ==}
+    engines: {pnpm: '>=7'}
+    peerDependencies:
+      typescript: '>=4.7.4'
+    dependencies:
+      typescript: 4.8.4
+    dev: false
 
   /abort-controller/3.0.0:
     resolution: {integrity: sha512-h8lQ8tacZYnR3vNQTgibj+tODHI5/+l06Au2Pcriv/Gmet0eaj4TwWH41sO9wnHDiQsEj19q0drzdWdeAHtweg==}

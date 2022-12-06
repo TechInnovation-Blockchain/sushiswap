@@ -17,6 +17,21 @@ import { DataFetcher } from "../scripts/DataFetcher";
 import { Router } from "../scripts/Router";
 import { getRouteProcessorCode } from "../scripts/TinesToRouteProcessor";
 
+import { configureChains, chain, createClient } from '@wagmi/core'
+import { alchemyProvider } from '@wagmi/core/providers/alchemy'
+const { provider, webSocketProvider } = configureChains(
+  [chain.mainnet, chain.polygon],
+  [
+    alchemyProvider({ apiKey: process.env.ALCHEMY_API_KEY as string }),
+    alchemyProvider({ apiKey: process.env.ALCHEMY_POLYGON_API_KEY as string }),
+  ],
+) 
+const client = createClient({
+  autoConnect: true,
+  provider,
+  webSocketProvider,
+})
+
 const delay = async (ms: number) => new Promise(res => setTimeout(res, ms));
 
 const WRAPPED_NATIVE: Record<number, Token>  = {
