@@ -9,14 +9,15 @@ interface DifficultyLabel {
   isCard?: boolean
 }
 export const DifficultyLabel: FC<DifficultyLabel> = ({ article, isCard }) => {
-  const difficulty = article.attributes?.difficulty?.data?.attributes
-  const difficultyColor = difficulty?.slug && DIFFICULTY_ELEMENTS[difficulty.slug].color
-
+  const difficultyColor =
+    article?.attributes?.difficulty?.data?.attributes?.slug &&
+    DIFFICULTY_ELEMENTS[article.attributes?.difficulty?.data?.attributes?.slug as keyof typeof DIFFICULTY_ELEMENTS]
+      .color
   return (
     <div className="flex items-center gap-1.5">
-      <CircleIcon width={8} height={8} stroke={difficultyColor} fill={difficultyColor} />
+      <CircleIcon width={8} height={8} stroke={difficultyColor as string} fill={difficultyColor as string} />
       <span className={classNames(isCard ? 'text-xs font-medium' : 'text-xs font-medium sm:text-sm sm:font-normal')}>
-        {difficulty?.label}
+        {article.attributes?.difficulty?.data?.attributes?.label}
       </span>
     </div>
   )

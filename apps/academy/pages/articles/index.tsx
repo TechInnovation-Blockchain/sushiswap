@@ -9,6 +9,8 @@ import { FC, useEffect, useMemo, useState } from 'react'
 import useSWR, { SWRConfig } from 'swr'
 
 import {
+  Article,
+  ArticleEntity,
   DifficultyEntity,
   DifficultyEntityResponseCollection,
   ProductEntity,
@@ -146,7 +148,7 @@ const _Articles: FC = () => {
   const headerTitle = useMemo(() => {
     let title = 'Latest releases'
     if (router.isReady) {
-      if (selectedDifficulty) title = selectedDifficulty.attributes.shortDescription
+      if (selectedDifficulty) title = selectedDifficulty?.attributes?.shortDescription as string
       if (searchQuery || selectedTopic || selectedProduct) title = 'Search results'
     }
     return title
@@ -158,7 +160,8 @@ const _Articles: FC = () => {
       <ArticlesPageHeader
         title={headerTitle}
         difficulties={difficulties}
-        selectedDifficulty={selectedDifficulty}
+        selectedDifficulty={selectedDifficulty as DifficultyEntity}
+        // @ts-ignore
         onSelect={handleSelectDifficulty}
       />
       <Container maxWidth="6xl" className={classNames('mx-auto pb-10', DEFAULT_SIDE_PADDING)}>
@@ -298,7 +301,7 @@ const _Articles: FC = () => {
                 </div>
                 <div className="grid gap-6 grid-cols-[repeat(auto-fill,minmax(286px,1fr))] sm:mt-12 mt-[22px]">
                   <ArticleList
-                    articles={articles}
+                    articles={articles as ArticleEntity[]}
                     loading={loading || !articles}
                     render={(article) => <Card article={article} key={`article__left__${article?.attributes?.slug}`} />}
                   />
@@ -306,11 +309,11 @@ const _Articles: FC = () => {
               </>
             )}
             <div className="flex justify-center mt-12">
-              {articlesMeta?.pagination?.pageCount > 0 && (
+              {articlesMeta?.pagination?.pageCount && articlesMeta.pagination.pageCount > 0 && (
                 <Pagination
-                  page={articlesMeta.pagination.page}
+                  page={articlesMeta?.pagination?.page as number}
                   onPage={setPage}
-                  pages={articlesMeta.pagination.pageCount}
+                  pages={articlesMeta?.pagination?.pageCount as number}
                 />
               )}
             </div>

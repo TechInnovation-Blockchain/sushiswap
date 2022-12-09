@@ -18,16 +18,18 @@ import Image from 'next/legacy/image'
 import { FC } from 'react'
 import useSWR from 'swr'
 
-import { ArticleEntity } from '.mesh'
+import { ArticleEntity, Product } from '.mesh'
 
 const PRODUCT_SLUG = 'onsen'
 const { color, productStats, buttonText, cards, faq } = PRODUCTS_DATA[PRODUCT_SLUG]
 
 export const getStaticProps = async () => {
   const data = await getProducts({ filters: { slug: { eq: PRODUCT_SLUG } } })
-  const product = data?.products?.data?.[0].attributes
-
-  return { props: product }
+  const product = data?.products?.data?.[0].attributes as Pick<
+    Product,
+    'name' | 'description' | 'longName' | 'slug' | 'url' | 'relevantArticleIds'
+  >
+  return { props: product, revalidate: 60 }
 }
 
 const ProductPage: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
@@ -40,7 +42,7 @@ const ProductPage: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
 }) => {
   const { data, isValidating } = useSWR(
     [`/bentobox-articles`],
-    async () => await getLatestAndRelevantArticles(slug, relevantArticleIds),
+    async () => await getLatestAndRelevantArticles(slug as string, relevantArticleIds),
     { revalidateOnFocus: false, revalidateIfStale: false, revalidateOnReconnect: false }
   )
 
@@ -54,8 +56,8 @@ const ProductPage: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
       <ProductBackground color={color} />
       <ProductHero
         productName={longName}
-        productDescription={description}
-        productUrl={url}
+        productDescription={description as string}
+        productUrl={url as string}
         buttonText={buttonText}
         buttonIcon={<ArrowRightCircleIcon width={20} height={20} />}
         image={<Image src={onsenImg} unoptimized alt="onsen-img" />}
@@ -72,7 +74,7 @@ const ProductPage: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
         <div className="grid gap-2 sm:gap-6 mt-10 sm:mt-[70px]">
           <div className="flex items-center gap-4">
             <TradingIcon className="w-10 sm:w-[52px]" />
-            <span className="font-bold text-lg sm:text-2xl">For Traders</span>
+            <span className="text-lg font-bold sm:text-2xl">For Traders</span>
           </div>
 
           <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-x-6 gap-y-4 sm:gap-y-8">
@@ -87,20 +89,20 @@ const ProductPage: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
                 <div className="p-8 md:p-12 h-full bg-[#212939] rounded-3xl">
                   <card.Icon />
                   <div className="mt-6 sm:mt-10">
-                    <h3 className="text-xl sm:text-2xl font-bold">{card.title}</h3>
+                    <h3 className="text-xl font-bold sm:text-2xl">{card.title}</h3>
                   </div>
                   <div className="mt-2 sm:mt-4">
-                    <p className="text-slate-400 text-xs sm:text-sm">{card.subtitle}</p>
+                    <p className="text-xs text-slate-400 sm:text-sm">{card.subtitle}</p>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
-        <div className="grid gap-2 sm:gap-6 mt-10 sm:mt-20">
+        <div className="grid gap-2 mt-10 sm:gap-6 sm:mt-20">
           <div className="flex items-center gap-4">
             <PeopleIcon className="w-10 sm:w-[52px]" />
-            <span className="font-bold text-lg sm:text-2xl">For Projects</span>
+            <span className="text-lg font-bold sm:text-2xl">For Projects</span>
           </div>
           <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-x-6 gap-y-8">
             {projectCards.map((card, i) => (

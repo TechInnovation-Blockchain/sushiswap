@@ -12,20 +12,22 @@ import {
 import { DEFAULT_SIDE_PADDING } from 'common/helpers'
 import { PRODUCTS_DATA } from 'common/productsData'
 import { getLatestAndRelevantArticles, getProducts } from 'lib/api'
-import { InferGetStaticPropsType } from 'next'
+import { GetStaticProps, InferGetStaticPropsType } from 'next'
 import React, { FC } from 'react'
 import useSWR from 'swr'
 
-import { ArticleEntity } from '.mesh'
+import { ArticleEntity, Product } from '.mesh'
 
 const PRODUCT_SLUG = 'trident'
 const { color, productStats, cards, faq } = PRODUCTS_DATA[PRODUCT_SLUG]
 
-export const getStaticProps = async () => {
+export const getStaticProps: GetStaticProps = async () => {
   const data = await getProducts({ filters: { slug: { eq: PRODUCT_SLUG } } })
-  const product = data?.products?.data?.[0].attributes
-
-  return { props: product }
+  const product = data?.products?.data?.[0].attributes as Pick<
+    Product,
+    'name' | 'description' | 'longName' | 'slug' | 'url' | 'relevantArticleIds'
+  >
+  return { props: product, revalidate: 60 }
 }
 
 const ProductPage: FC<InferGetStaticPropsType<typeof getStaticProps>> = ({

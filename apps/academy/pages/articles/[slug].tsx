@@ -58,7 +58,9 @@ interface ArticlePage {
 const ArticlePage: FC<ArticlePage> = ({ article, latestArticles, preview }) => {
   const router = useRouter()
   const tableOfContents = article?.attributes?.staticTableOfContents?.entries
+  // @ts-ignore
   const tableOfContentsFiltered = tableOfContents?.filter(({ key }) =>
+    // @ts-ignore
     article?.attributes?.blocks.some((block) => 'key' in block && block.key === key)
   )
   const { isSm } = useBreakpoint('sm')
@@ -110,19 +112,19 @@ const ArticlePage: FC<ArticlePage> = ({ article, latestArticles, preview }) => {
               <ArticleLinks article={article} />
               <hr className="border border-slate-200/5" />
               <ol className="grid gap-8 list-decimal list-inside">
-                {tableOfContentsFiltered?.map(({ text, key }) => (
+                {tableOfContentsFiltered?.map((componentSharedTableOfContentsEntry) => (
                   <li
-                    key={key}
+                    key={componentSharedTableOfContentsEntry?.key}
                     className={classNames(
                       'hover:text-slate-50 font-medium text-base cursor-pointer',
-                      selectedHeader === key ? 'text-slate-50' : 'text-slate-400'
+                      selectedHeader === componentSharedTableOfContentsEntry?.key ? 'text-slate-50' : 'text-slate-400'
                     )}
                     onClick={() => {
-                      scrollToHeader(key)
-                      setSelectedHeader(text)
+                      scrollToHeader(componentSharedTableOfContentsEntry?.key as string)
+                      setSelectedHeader(componentSharedTableOfContentsEntry?.text as string)
                     }}
                   >
-                    {text}
+                    {componentSharedTableOfContentsEntry?.text}
                   </li>
                 ))}
               </ol>

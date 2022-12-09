@@ -14,15 +14,15 @@ interface DifficultyCard {
 export const DifficultyCard: FC<DifficultyCard> = ({ difficulty }) => {
   const [hover, setHover] = useState(false)
 
-  const {
-    attributes: { label, longDescription, slug },
-  } = difficulty
-  const { color, Icon } = DIFFICULTY_ELEMENTS[slug]
-  const isTechnicalCard = slug === 'technical'
+  // const {
+  //   attributes: { label, longDescription, slug },
+  // } = difficulty
+  const { color, Icon } = DIFFICULTY_ELEMENTS[difficulty?.attributes?.slug as keyof typeof DIFFICULTY_ELEMENTS]
+  const isTechnicalCard = difficulty?.attributes?.slug === 'technical'
 
   return (
     <a
-      href={isTechnicalCard ? DOCS_URL : `/academy/articles?difficulty=${slug}`}
+      href={isTechnicalCard ? DOCS_URL : `/academy/articles?difficulty=${difficulty?.attributes?.slug}`}
       target={isTechnicalCard ? '_blank' : '_self'}
       rel="noreferrer"
       className="h-[405px] py-[50px] px-[30px] bg-slate-800 rounded-[30px] flex flex-col justify-between hover:ring-1 ring-slate-600 transition duration-300"
@@ -34,7 +34,7 @@ export const DifficultyCard: FC<DifficultyCard> = ({ difficulty }) => {
       <div className="space-y-5">
         <div className="relative flex items-center h-10">
           <Chip
-            label={label}
+            label={difficulty?.attributes?.label}
             color="default"
             className="h-7 sm:text-sm sm:font-normal pl-[14px] pr-[14px]"
             icon={<CircleIcon width={8} height={8} fill={color} stroke={color} />}
@@ -57,7 +57,7 @@ export const DifficultyCard: FC<DifficultyCard> = ({ difficulty }) => {
             </div>
           </Transition>
         </div>
-        <p className="text-xl font-bold sm:text-2xl">{longDescription}</p>
+        <p className="text-xl font-bold sm:text-2xl">{difficulty?.attributes?.longDescription}</p>
       </div>
     </a>
   )

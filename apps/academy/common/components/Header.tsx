@@ -1,3 +1,4 @@
+import { Maybe } from '.mesh'
 import { Listbox } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/24/outline'
 import { App, classNames, Link, Select, Typography } from '@sushiswap/ui'
@@ -11,14 +12,14 @@ import useSWR from 'swr'
 import { MobileMenu } from '.'
 
 interface HeaderLink {
-  name: string
+  name: Maybe<string> | undefined
   href: string
   isExternal?: boolean
 }
 
 export interface HeaderSection {
   title: string
-  href?: string
+  href?: Maybe<string> | undefined
   links?: HeaderLink[]
   isExternal?: boolean
 }
@@ -33,7 +34,9 @@ export const Header: FC = () => {
   const products = useMemo(() => productsData?.data ?? [], [productsData?.data])
   const difficulties = useMemo(() => difficultiesData?.data ?? [], [difficultiesData?.data])
   const sortedProducts = products.sort((a, b) =>
-    PRODUCTS_ORDER.indexOf(a.attributes.slug) > PRODUCTS_ORDER.indexOf(b.attributes.slug) ? 1 : -1
+    PRODUCTS_ORDER.indexOf(a?.attributes?.slug as string) > PRODUCTS_ORDER.indexOf(b?.attributes?.slug as string)
+      ? 1
+      : -1
   )
 
   const navData: HeaderSection[] = useMemo(
@@ -48,18 +51,18 @@ export const Header: FC = () => {
       },
       {
         title: 'Products',
-        links: sortedProducts.map(({ attributes: { longName, slug } }) => ({
-          name: longName,
-          href: `/products/${slug}`,
+        links: sortedProducts.map(({ attributes }) => ({
+          name: attributes?.longName,
+          href: `/products/${attributes?.slug}`,
         })),
       },
       {
         title: 'Learn',
-        links: difficulties?.map(({ attributes: { shortDescription, slug } }) => {
-          const isTechnical = slug === 'technical'
+        links: difficulties?.map(({ attributes }) => {
+          const isTechnical = attributes?.slug === 'technical'
           return {
-            name: shortDescription,
-            href: isTechnical ? DOCS_URL : `/articles?difficulty=${slug}`,
+            name: attributes?.shortDescription,
+            href: isTechnical ? DOCS_URL : `/articles?difficulty=${attributes?.slug}`,
             isExternal: isTechnical,
           }
         }),

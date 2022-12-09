@@ -11,7 +11,7 @@ interface Breadcrumb {
 }
 
 export const Breadcrumb: FC<Breadcrumb> = ({ article }) => {
-  const shareText = getShareText(article?.attributes.title)
+  const shareText = getShareText(article?.attributes?.title)
   const url = `https://sushi.com/academy/articles/${article?.attributes?.slug}`
 
   const onShare = () => {
